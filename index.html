@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diario Emocional</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FAF9F7;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.1);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --text-hint: #A0A0A0;
+    --accent: #7F77DD;
+    --accent-bg: #EEEDFE;
+    --accent-text: #3C3489;
+    --success-bg: #EAF3DE;
+    --success-text: #3B6D11;
+    --danger-bg: #FCEBEB;
+    --danger-text: #A32D2D;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-pill: 20px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  header {
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .fecha {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .seccion-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-hint);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.125rem;
+    margin-bottom: 8px;
+  }
+
+  .q {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  textarea, input[type=text], input[type=time] {
+    width: 100%;
+    background: var(--bg);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  textarea:focus, input[type=text]:focus, input[type=time]:focus {
+    border-color: var(--accent);
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sub-label { font-size: 12px; color: var(--text-hint); margin-bottom: 4px; display: block; }
+
+  .mood-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    padding: 6px 13px;
+    border-radius: var(--radius-pill);
+    border: 0.5px solid var(--border-strong);
+    background: var(--bg);
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent-text); }
+  .chip.sel-accent { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 500; }
+  .chip.sel-yes { background: var(--success-bg); border-color: #639922; color: var(--success-text); font-weight: 500; }
+  .chip.sel-no { background: var(--danger-bg); border-color: #E24B4A; color: var(--danger-text); font-weight: 500; }
+
+  .yn { display: flex; gap: 8px; }
+  .yn .chip { flex: 1; text-align: center; }
+
+  .scale { display: flex; gap: 5px; flex-wrap: wrap; }
+  .scale-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 0.5px solid var(--border-strong);
+    background: var(--bg);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .scale-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+  .scale-btn.sel-accent { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+
+  .export-area { margin-top: 2rem; }
+
+  .btn-export {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: opacity 0.15s;
+  }
+  .btn-export:hover { opacity: 0.88; }
+  .btn-export:active { opacity: 0.75; }
+
+  .toast {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--success-text);
+    background: var(--success-bg);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    display: none;
+  }
+
+  .historial-toggle {
+    margin-top: 2rem;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .historial-toggle:hover { background: var(--surface); }
+
+  #historial { display: none; margin-top: 1rem; }
+
+  .entrada {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.875rem 1rem;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .entrada-fecha { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .entrada-preview { color: var(--text-secondary); }
+  .entrada-delete {
+    float: right;
+    background: none;
+    border: none;
+    color: var(--text-hint);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+  }
+  .entrada-delete:hover { color: var(--danger-text); }
+
+  .empty-historial { text-align: center; color: var(--text-hint); font-size: 13px; padding: 1.5rem; }
+
+  @media (max-width: 420px) {
+    .container { padding: 1.25rem 1rem 3rem; }
+    .row2 { grid-template-columns: 1fr; }
+    .scale-btn { width: 34px; height: 34px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Diario emocional</h1>
+    <div class="fecha" id="fecha-display"></div>
+  </header>
+
+  <!-- SUEÑO -->
+  <div class="seccion-label">Sueño</div>
+
+  <div class="card">
+    <span class="q">¿A qué hora te dormiste y despertaste?</span>
+    <div class="row2">
+      <div>
+        <span class="sub-label">Me dormí</span>
+        <input type="time" id="hora-dormir">
+      </div>
+      <div>
+        <span class="sub-label">Me desperté</span>
+        <input type="time" id="hora-despertar">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="q">¿Dormiste de corrido?</span>
+    <div class="yn" id="yn-sueno">
+      <div class="chip" onclick="toggleYN('yn-sueno',this,'yes')">Sí</div>
+      <div class="chip" onclick="toggleYN('yn-sueno',this,'no')">No, me desperté</div>
+    </div>
+  </div>
+
+  <!-- AL DESPERTAR -->
+  <div class="seccion-label">Al despertar</div>
+
+  <div class="card">
+    <span class="q">¿Cómo te sentiste al abrir los ojos?</span>
+    <div class="mood-row" id="mood-despertar">
+      <div class="chip" onclick="selectChip('mood-despertar',this)">Con energía</div>
+      <div class="chip" onclick="selectChip('mood-despertar',this)">Neutral</div>
+      <div class="chip" onclick="selectChip('mood-despertar',this)">Sin ganas</div>
+      <div class="chip" onclick="selectChip('mood-despertar',this)">Ansiosa</div>
+      <div class="chip" onclick="selectChip('mood-despertar',this)">Pesada / apagada</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="q">¿Qué fue lo primero que pensaste al despertar?</span>
+    <textarea id="primer-pensamiento" placeholder="Escribe libremente..."></textarea>
+  </div>
+
+  <!-- MEDICAMENTOS -->
+  <div class="seccion-label">Medicamentos</div>
+
+  <div class="card">
+    <span class="q">¿Te tomaste los medicamentos hoy?</span>
+    <div class="yn" id="yn-meds">
+      <div class="chip" onclick="toggleYN('yn-meds',this,'yes')">Sí, a tiempo</div>
+      <div class="chip" onclick="toggleYN('yn-meds',this,'no')">No / tarde</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="q">Si no fue a la hora habitual, ¿por qué? (opcional)</span>
+    <input type="text" id="meds-razon" placeholder="Ej: se me olvidó, estaba fuera...">
+  </div>
+
+  <!-- ESTADO DEL DÍA -->
+  <div class="seccion-label">Estado emocional del día</div>
+
+  <div class="card">
+    <span class="q">¿Cómo describirías tu estado principal hoy?</span>
+    <div class="mood-row" id="mood-dia">
+      <div class="chip" onclick="selectChip('mood-dia',this)">Deprimida</div>
+      <div class="chip" onclick="selectChip('mood-dia',this)">Ansiosa</div>
+      <div class="chip" onclick="selectChip('mood-dia',this)">Eufórica</div>
+      <div class="chip" onclick="selectChip('mood-dia',this)">Irritable</div>
+      <div class="chip" onclick="selectChip('mood-dia',this)">Estable</div>
+      <div class="chip" onclick="selectChip('mood-dia',this)">Vacía</div>
+      <div class="chip" onclick="selectChip('mood-dia',this)">Mezclado</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="q">Intensidad emocional del día (1 = casi nada · 10 = muy intensa)</span>
+    <div class="scale" id="scale-intensidad"></div>
+  </div>
+
+  <!-- ACTIVACIÓN -->
+  <div class="seccion-label">Activación y contexto</div>
+
+  <div class="card">
+    <span class="q">¿Tuviste algún "ancla" hoy? (algo que esperar, visita, plan, tarea)</span>
+    <div class="yn" id="yn-ancla" style="margin-bottom:8px">
+      <div class="chip" onclick="toggleYN('yn-ancla',this,'yes')">Sí</div>
+      <div class="chip" onclick="toggleYN('yn-ancla',this,'no')">No</div>
+    </div>
+    <textarea id="ancla-detalle" placeholder="¿Qué fue?" style="min-height:44px"></textarea>
+  </div>
+
+  <div class="card">
+    <span class="q">¿Pudiste ejecutar tu día con normalidad?</span>
+    <div class="yn" id="yn-ejecutar">
+      <div class="chip" onclick="toggleYN('yn-ejecutar',this,'yes')">Sí</div>
+      <div class="chip" onclick="toggleYN('yn-ejecutar',this,'no')">Me costó mucho</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="q">¿Hubo algo que cambió tu estado durante el día?</span>
+    <textarea id="cambio-estado" placeholder="Una conversación, algo que viste, una noticia, un recuerdo..."></textarea>
+  </div>
+
+  <!-- CIERRE -->
+  <div class="seccion-label">Cierre del día</div>
+
+  <div class="card">
+    <span class="q">¿Cómo terminaste el día comparado con cómo empezaste?</span>
+    <div class="mood-row" id="mood-cierre">
+      <div class="chip" onclick="selectChip('mood-cierre',this)">Mejor</div>
+      <div class="chip" onclick="selectChip('mood-cierre',this)">Igual</div>
+      <div class="chip" onclick="selectChip('mood-cierre',this)">Peor</div>
+      <div class="chip" onclick="selectChip('mood-cierre',this)">Muy fluctuante</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="q">¿Qué fue lo último que pensaste antes de dormir?</span>
+    <textarea id="ultimo-pensamiento" placeholder="Escribe libremente..."></textarea>
+  </div>
+
+  <div class="card">
+    <span class="q">Algo más para llevar a consulta</span>
+    <textarea id="notas-extra" placeholder="Sin filtros..."></textarea>
+  </div>
+
+  <!-- EXPORTAR -->
+  <div class="export-area">
+    <button class="btn-export" onclick="guardarYExportar()">Guardar y copiar resumen</button>
+    <div class="toast" id="toast">Copiado — pégalo en tu chat o notas</div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <button class="historial-toggle" onclick="toggleHistorial()">Ver registros anteriores ↓</button>
+  <div id="historial"></div>
+
+</div>
+
+<script>
+  // Fecha
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const hoy = new Date();
+  const fechaStr = dias[hoy.getDay()] + ' ' + hoy.getDate() + ' de ' + meses[hoy.getMonth()] + ', ' + hoy.getFullYear();
+  document.getElementById('fecha-display').textContent = fechaStr;
+
+  // Scale
+  const scaleEl = document.getElementById('scale-intensidad');
+  for(let i = 1; i <= 10; i++) {
+    const b = document.createElement('div');
+    b.className = 'scale-btn';
+    b.textContent = i;
+    b.onclick = function() {
+      document.querySelectorAll('#scale-intensidad .scale-btn').forEach(x => x.classList.remove('sel-accent'));
+      this.classList.add('sel-accent');
+    };
+    scaleEl.appendChild(b);
+  }
+
+  function selectChip(groupId, btn) {
+    document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('sel-accent'));
+    btn.classList.add('sel-accent');
+  }
+
+  function toggleYN(groupId, btn, type) {
+    document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('sel-yes','sel-no'));
+    btn.classList.add(type === 'yes' ? 'sel-yes' : 'sel-no');
+  }
+
+  function getChip(id) {
+    const s = document.querySelector('#' + id + ' .chip.sel-accent');
+    return s ? s.textContent.trim() : '—';
+  }
+  function getYN(id) {
+    const s = document.querySelector('#' + id + ' .chip.sel-yes, #' + id + ' .chip.sel-no');
+    return s ? s.textContent.trim() : '—';
+  }
+  function getScale() {
+    const s = document.querySelector('#scale-intensidad .scale-btn.sel-accent');
+    return s ? s.textContent.trim() : '—';
+  }
+  function val(id) {
+    const el = document.getElementById(id);
+    return el && el.value.trim() ? el.value.trim() : '—';
+  }
+
+  function buildTexto() {
+    return [
+      '=== DIARIO EMOCIONAL ===',
+      fechaStr,
+      '',
+      '— SUEÑO —',
+      'Me dormí: ' + val('hora-dormir'),
+      'Me desperté: ' + val('hora-despertar'),
+      'Sueño corrido: ' + getYN('yn-sueno'),
+      '',
+      '— AL DESPERTAR —',
+      'Estado al despertar: ' + getChip('mood-despertar'),
+      'Primer pensamiento: ' + val('primer-pensamiento'),
+      '',
+      '— MEDICAMENTOS —',
+      'Tomados: ' + getYN('yn-meds'),
+      'Razón si no: ' + val('meds-razon'),
+      '',
+      '— ESTADO DEL DÍA —',
+      'Estado principal: ' + getChip('mood-dia'),
+      'Intensidad (1-10): ' + getScale(),
+      '',
+      '— ACTIVACIÓN —',
+      'Tuvo ancla: ' + getYN('yn-ancla'),
+      'Detalle ancla: ' + val('ancla-detalle'),
+      'Ejecutó el día: ' + getYN('yn-ejecutar'),
+      'Cambio de estado: ' + val('cambio-estado'),
+      '',
+      '— CIERRE —',
+      'Estado al final: ' + getChip('mood-cierre'),
+      'Último pensamiento: ' + val('ultimo-pensamiento'),
+      'Notas para consulta: ' + val('notas-extra'),
+    ].join('\n');
+  }
+
+  function guardarYExportar() {
+    const texto = buildTexto();
+    // Guardar en localStorage
+    const key = 'diario_' + hoy.toISOString().split('T')[0];
+    const entrada = {
+      fecha: fechaStr,
+      iso: hoy.toISOString().split('T')[0],
+      texto: texto,
+      resumen: getChip('mood-dia') + ' · intensidad ' + getScale()
+    };
+    localStorage.setItem(key, JSON.stringify(entrada));
+
+    // Copiar
+    navigator.clipboard.writeText(texto).then(() => {
+      mostrarToast('Guardado y copiado — pégalo en tu chat o notas');
+    }).catch(() => {
+      mostrarToast('Guardado. Copia el texto manualmente desde el botón de historial.');
+    });
+    renderHistorial();
+  }
+
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  function toggleHistorial() {
+    const h = document.getElementById('historial');
+    if(h.style.display === 'none' || h.style.display === '') {
+      h.style.display = 'block';
+      renderHistorial();
+    } else {
+      h.style.display = 'none';
+    }
+  }
+
+  function renderHistorial() {
+    const h = document.getElementById('historial');
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('diario_')).sort().reverse();
+    if(keys.length === 0) {
+      h.innerHTML = '<div class="empty-historial">Aún no hay registros guardados.</div>';
+      return;
+    }
+    h.innerHTML = keys.map(k => {
+      const e = JSON.parse(localStorage.getItem(k));
+      return `<div class="entrada">
+        <button class="entrada-delete" onclick="borrarEntrada('${k}')" title="Borrar">×</button>
+        <div class="entrada-fecha">${e.fecha}</div>
+        <div class="entrada-preview">${e.resumen}</div>
+        <button onclick="copiarEntrada('${k}')" style="margin-top:6px;font-size:12px;background:none;border:0.5px solid #ccc;border-radius:6px;padding:4px 10px;cursor:pointer;color:#6B6B6B;">Copiar texto</button>
+      </div>`;
+    }).join('');
+  }
+
+  function borrarEntrada(key) {
+    if(confirm('¿Borrar este registro?')) {
+      localStorage.removeItem(key);
+      renderHistorial();
+    }
+  }
+
+  function copiarEntrada(key) {
+    const e = JSON.parse(localStorage.getItem(key));
+    navigator.clipboard.writeText(e.texto).then(() => mostrarToast('Copiado'));
+  }
+</script>
+</body>
+</html>
