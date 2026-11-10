@@ -672,7 +672,22 @@ async function importMedia(files, target) {
   else toast(`"${lastName}" cargado. Selecciona un mockup o imagen y elígelo en "Medio", o arrástralo encima.`);
   refreshAll();
 }
-$('#btnMedia').onclick = () => $('#fileMedia').click();
+// "Medios": subir archivos y ver cuáles están cargados, y si quedaron guardados en este navegador.
+$('#btnMedia').onclick = async (e) => {
+  const btn = e.currentTarget;
+  const rows = await allFiles(); const saved = new Map(rows.map((r) => [r.name, r.blob.size]));
+  const items = [['⬆ Subir archivos…', () => $('#fileMedia').click()]];
+  for (const name of assets.keys()) {
+    const mb = saved.has(name) ? ` · ${(saved.get(name) / 1e6).toFixed(1)} MB` : '';
+    items.push([`${saved.has(name) ? '✓ guardado' : '⚠ solo esta sesión'} · ${name}${mb}`, () => {
+      const l = sel();
+      if (l && (l.type === 'image' || l.type === 'mockup')) { l.asset = name; commit(); refreshAll(); toast(`"${name}" asignado a ${l.name}`); }
+      else toast('Selecciona primero un mockup o una imagen en la lista de capas.');
+    }]);
+  }
+  if (items.length === 1) items.push(['(no hay grabaciones ni imágenes cargadas)', () => {}]);
+  openMenu(btn, items);
+};
 $('#fileMedia').onchange = (e) => { importMedia([...e.target.files]); e.target.value = ''; };
 overlay.addEventListener('dragover', (e) => { e.preventDefault(); overlay.classList.add('drop'); });
 overlay.addEventListener('dragleave', () => overlay.classList.remove('drop'));
