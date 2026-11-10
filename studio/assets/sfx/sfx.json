@@ -1,12 +1,50 @@
 {
-  "origen": "ElevenLabs Sound Effects (eleven_text_to_sound_v2), plan Starter con licencia comercial",
+  "origen": "ElevenLabs Sound Effects y Music, plan Starter con licencia comercial",
   "sonidos": [
-    { "archivo": "whoosh-1.mp3", "uso": "entrada de títulos y cambios de escena", "prompt": "Soft smooth whoosh swipe, short, clean, modern transition, airy" },
-    { "archivo": "whoosh-2.mp3", "uso": "alternativa de whoosh", "prompt": "Soft smooth whoosh swipe, short, clean, modern transition, airy" },
-    { "archivo": "pop-1.mp3", "uso": "aparición de pastillas y chips", "prompt": "Soft bubbly pop, short, clean, friendly interface sound" },
-    { "archivo": "pop-2.mp3", "uso": "alternativa de pop", "prompt": "Soft bubbly pop, short, clean, friendly interface sound" },
-    { "archivo": "tick-1.mp3", "uso": "números de cada paso", "prompt": "Single crisp soft tick, subtle button click, close-mic, dry" },
-    { "archivo": "chime-1.mp3", "uso": "botón final de WhatsApp", "prompt": "Gentle bright two-note chime, short, warm, positive notification" },
-    { "archivo": "chime-2.mp3", "uso": "alternativa de campanita (1,8 s)", "prompt": "Gentle bright two-note chime, short, warm, positive notification" }
+    {
+      "archivo": "whoosh-1.mp3",
+      "uso": "entrada de títulos y cambios de escena",
+      "prompt": "Soft smooth whoosh swipe, short, clean, modern transition, airy"
+    },
+    {
+      "archivo": "whoosh-2.mp3",
+      "uso": "alternativa de whoosh",
+      "prompt": "Soft smooth whoosh swipe, short, clean, modern transition, airy"
+    },
+    {
+      "archivo": "pop-1.mp3",
+      "uso": "aparición de pastillas y chips",
+      "prompt": "Soft bubbly pop, short, clean, friendly interface sound"
+    },
+    {
+      "archivo": "pop-2.mp3",
+      "uso": "alternativa de pop",
+      "prompt": "Soft bubbly pop, short, clean, friendly interface sound"
+    },
+    {
+      "archivo": "tick-1.mp3",
+      "uso": "números de cada paso",
+      "prompt": "Single crisp soft tick, subtle button click, close-mic, dry"
+    },
+    {
+      "archivo": "chime-1.mp3",
+      "uso": "botón final de WhatsApp",
+      "prompt": "Gentle bright two-note chime, short, warm, positive notification"
+    },
+    {
+      "archivo": "chime-2.mp3",
+      "uso": "alternativa de campanita (1,8 s)",
+      "prompt": "Gentle bright two-note chime, short, warm, positive notification"
+    },
+    {
+      "archivo": "musica-1.mp3",
+      "uso": "música de fondo, versión 1 (40 s, instrumental)",
+      "prompt": "Calm modern minimal pop instrumental for a business explainer, warm soft pads, gentle plucked synth, light steady soft kick and finger snaps, clean airy production, mid tempo around 100 bpm, optimistic and unobtrusive"
+    },
+    {
+      "archivo": "musica-2.mp3",
+      "uso": "música de fondo, versión 2 (40 s, instrumental)",
+      "prompt": "Calm modern minimal pop instrumental for a business explainer, warm soft pads, gentle plucked synth, light steady soft kick and finger snaps, clean airy production, mid tempo around 100 bpm, optimistic and unobtrusive"
+    }
   ]
 }

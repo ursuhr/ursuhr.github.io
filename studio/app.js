@@ -141,11 +141,17 @@ function addSound(name) {
     x: 0, y: 0, w: 0, h: 0, rot: 0, opacity: 1, animIn: 'none', animOut: 'none', animDur: 0.45 };
   S.P.layers.push(l); S.sel = l.id; commit(); refreshAll(); previewSound(l);
 }
+// Volumen de un sonido con entrada y salida graduales. off = segundos de la capa que ya pasaron; len = cuánto va a sonar.
+function shapeGain(g, when, vol, len, fi, fo, off = 0) {
+  const p = g.gain; fi = fi || 0; fo = fo || 0;
+  if (fi > 0 && off < fi) { p.setValueAtTime(vol * (off / fi), when); p.linearRampToValueAtTime(vol, when + (fi - off)); } else p.setValueAtTime(vol, when);
+  if (fo > 0 && len > fo) { p.setValueAtTime(vol, Math.max(when + (fi > off ? fi - off : 0), when + len - fo)); p.linearRampToValueAtTime(0, when + len); }
+}
 function previewSound(l) {
   const snd = sounds.get(l.asset); if (!snd) return;
   const c = getAC(); if (c.state === 'suspended') c.resume();
   const src = c.createBufferSource(); src.buffer = snd.buffer;
-  const g = c.createGain(); g.gain.value = l.volume ?? 0.35; src.connect(g).connect(c.destination); src.start();
+  const g = c.createGain(); shapeGain(g, c.currentTime, l.volume ?? 0.35, snd.buffer.duration, l.fadeIn, l.fadeOut); src.connect(g).connect(c.destination); src.start();
 }
 function stopSounds() { for (const x of liveSrc) { try { x.stop(); } catch { /* ya terminó */ } } liveSrc = []; }
 function scheduleSounds(t0) {
@@ -158,9 +164,10 @@ function scheduleSounds(t0) {
     const end = Math.min(l.end, l.start + snd.buffer.duration);
     if (end <= t0) continue;
     const src = c.createBufferSource(); src.buffer = snd.buffer;
-    const g = c.createGain(); g.gain.value = l.volume ?? 0.35; src.connect(g).connect(c.destination);
     const from = Math.max(l.start, t0);
-    src.start(now + Math.max(0, l.start - t0), Math.max(0, t0 - l.start), Math.max(0.01, end - from));
+    const when = now + Math.max(0, l.start - t0);
+    const g = c.createGain(); shapeGain(g, when, l.volume ?? 0.35, end - from, l.fadeIn, l.fadeOut, Math.max(0, t0 - l.start)); src.connect(g).connect(c.destination);
+    src.start(when, Math.max(0, t0 - l.start), Math.max(0.01, end - from));
     liveSrc.push(src);
   }
 }
@@ -360,7 +367,8 @@ const SCHEMA = {
   mockup: [F('kind', 'Dispositivo', 'select', { options: [['browser', 'Navegador'], ['phone', 'Celular']] }), F('asset', 'Medio', 'asset'),
     F('url', 'URL (navegador)', 'text'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }), ...MEDIA_FIELDS],
   logo: [F('variant', 'Versión', 'select', { options: [['dark', 'Negro'], ['light', 'Marfil']] })],
-  sound: [F('asset', 'Sonido', 'asset', { sound: true }), F('volume', 'Volumen (0 a 1,5)', 'number', { step: 0.05, def: () => 0.35 })],
+  sound: [F('asset', 'Sonido', 'asset', { sound: true }), F('volume', 'Volumen (0 a 1,5)', 'number', { step: 0.01, def: () => 0.35 }),
+    F('fadeIn', 'Entrada gradual (s)', 'number', { step: 0.1, def: () => 0 }), F('fadeOut', 'Salida gradual (s)', 'number', { step: 0.1, def: () => 0 })],
 };
 const SWATCHES = [BRAND.black, BRAND.ivory, BRAND.coral, BRAND.sun, BRAND.green, BRAND.sky, '#FFFFFF'];
 let inspInputs = {};
@@ -746,8 +754,9 @@ async function mixAudio() {
   for (const l of live) {
     const buf = sounds.get(l.asset).buffer;
     const src = oc.createBufferSource(); src.buffer = buf;
-    const g = oc.createGain(); g.gain.value = l.volume ?? 0.35; src.connect(g).connect(oc.destination);
-    src.start(l.start, 0, Math.max(0.01, Math.min(l.end - l.start, buf.duration)));
+    const len = Math.max(0.01, Math.min(l.end - l.start, buf.duration));
+    const g = oc.createGain(); shapeGain(g, l.start, l.volume ?? 0.35, len, l.fadeIn, l.fadeOut); src.connect(g).connect(oc.destination);
+    src.start(l.start, 0, len);
   }
   return oc.startRendering();
 }
