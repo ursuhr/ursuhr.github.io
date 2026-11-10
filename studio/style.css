@@ -108,7 +108,7 @@ button { cursor: pointer; }
 .trow.sel { background: rgba(255,107,167,.09); }
 .bar { position: absolute; top: 4px; bottom: 4px; border-radius: 6px; background: var(--sky); color: var(--black); font-size: 11px; font-weight: 700; padding: 0 8px; line-height: 18px; overflow: hidden; white-space: nowrap; cursor: grab; user-select: none; }
 .bar.t-text { background: var(--sun); } .bar.t-shape { background: var(--coral); } .bar.t-caption { background: var(--green); }
-.bar.t-mockup, .bar.t-image { background: var(--sky); } .bar.t-logo { background: var(--line); }
+.bar.t-mockup, .bar.t-image { background: var(--sky); } .bar.t-sound { background: #CDBDF2; } .bar.t-logo { background: var(--line); }
 .bar.sel { outline: 2px solid var(--black); }
 .bar .eh { position: absolute; top: 0; bottom: 0; width: 7px; cursor: ew-resize; } .bar .eh.l { left: 0; } .bar .eh.r { right: 0; }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--black); z-index: 6; pointer-events: none; }
