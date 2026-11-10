@@ -230,13 +230,14 @@ function mediaSize(a) {
   return a.kind === 'video' ? [a.el.videoWidth, a.el.videoHeight] : [a.el.naturalWidth, a.el.naturalHeight];
 }
 
-function drawMedia(ctx, a, x, y, w, h, fit) {
+function drawMedia(ctx, a, x, y, w, h, fit, l = {}) {
   if (!a) return false;
   const [iw, ih] = mediaSize(a);
   if (!iw || !ih) return false;
-  const s = fit === 'contain' ? Math.min(w / iw, h / ih) : Math.max(w / iw, h / ih);
+  // zoom acerca el medio; fx/fy (0 a 1) eligen qué parte queda visible (0 izquierda/arriba, 1 derecha/abajo)
+  const s = (fit === 'contain' ? Math.min(w / iw, h / ih) : Math.max(w / iw, h / ih)) * (l.zoom || 1);
   const dw = iw * s, dh = ih * s;
-  ctx.drawImage(a.el, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  ctx.drawImage(a.el, x + (w - dw) * (l.fx ?? 0.5), y + (h - dh) * (l.fy ?? 0.5), dw, dh);
   return true;
 }
 
@@ -260,7 +261,7 @@ function drawImageLayer(ctx, l) {
   ctx.fillStyle = '#fff'; ctx.fill();
   ctx.shadowColor = 'transparent';
   ctx.clip();
-  if (!drawMedia(ctx, a, -l.w / 2, -l.h / 2, l.w, l.h, l.fit)) placeholder(ctx, -l.w / 2, -l.h / 2, l.w, l.h, l.placeholder);
+  if (!drawMedia(ctx, a, -l.w / 2, -l.h / 2, l.w, l.h, l.fit, l)) placeholder(ctx, -l.w / 2, -l.h / 2, l.w, l.h, l.placeholder);
   ctx.restore();
 }
 
@@ -274,7 +275,7 @@ function drawMockup(ctx, l) {
     ctx.shadowColor = 'transparent';
     ctx.save();
     roundRect(ctx, -w / 2 + bez, -h / 2 + bez, w - bez * 2, h - bez * 2, r - bez); ctx.clip();
-    if (!drawMedia(ctx, a, -w / 2 + bez, -h / 2 + bez, w - bez * 2, h - bez * 2, l.fit)) placeholder(ctx, -w / 2 + bez, -h / 2 + bez, w - bez * 2, h - bez * 2, l.placeholder);
+    if (!drawMedia(ctx, a, -w / 2 + bez, -h / 2 + bez, w - bez * 2, h - bez * 2, l.fit, l)) placeholder(ctx, -w / 2 + bez, -h / 2 + bez, w - bez * 2, h - bez * 2, l.placeholder);
     ctx.restore();
     ctx.fillStyle = '#0B0B0B'; roundRect(ctx, -w * 0.17, -h / 2 + bez + 10, w * 0.34, 30, 15); ctx.fill();
   } else {
@@ -295,7 +296,7 @@ function drawMockup(ctx, l) {
     ctx.fillText(l.url || 'ursulahr.cl', 30, -h / 2 + bar / 2 + 1);
     ctx.save();
     ctx.beginPath(); ctx.rect(-w / 2, -h / 2 + bar, w, h - bar); ctx.clip();
-    if (!drawMedia(ctx, a, -w / 2, -h / 2 + bar, w, h - bar, l.fit)) placeholder(ctx, -w / 2, -h / 2 + bar, w, h - bar, l.placeholder);
+    if (!drawMedia(ctx, a, -w / 2, -h / 2 + bar, w, h - bar, l.fit, l)) placeholder(ctx, -w / 2, -h / 2 + bar, w, h - bar, l.placeholder);
     ctx.restore();
     ctx.restore();
   }
