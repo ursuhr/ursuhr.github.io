@@ -725,7 +725,15 @@ function refreshAll(tl = true) {
   fitStage();
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { /* ignorar */ }
-  if (saved && Array.isArray(saved.layers)) setProject(saved); else await loadTemplate('proceso');
+  if (saved && Array.isArray(saved.layers)) {
+    // Si la plantilla del navegador es más antigua que la publicada, ofrecer la nueva.
+    const tid = saved.template || (saved.name === 'Reel · Cómo trabajo' ? 'proceso' : null);
+    let tpl = null;
+    if (tid) { try { const r = await fetch(`projects/${tid}.json`, { cache: 'no-cache' }); if (r.ok) tpl = await r.json(); } catch { /* sin red */ } }
+    if (tpl && (tpl.rev || 0) > (saved.rev || 0)
+      && confirm(`Hay una versión nueva de la plantilla "${tpl.name}".\n\nAceptar: cargarla (reemplaza el proyecto que tienes ahora; vuelve a subir tu audio después).\nCancelar: seguir con tu proyecto actual.`)) setProject(tpl);
+    else setProject(saved);
+  } else await loadTemplate('proceso');
   fitStage(); refreshAll();
   window.__studio = { S, play, pause, seek, doExport, addLayer, select, assets, importMedia };
 })();
