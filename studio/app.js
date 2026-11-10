@@ -283,6 +283,12 @@ $('#btnAdd').onclick = (e) => openMenu(e.currentTarget, [
 // ---------- inspector ----------
 const OPT_ANIM = [['none', 'Ninguna'], ['fade', 'Aparecer'], ['rise', 'Subir'], ['pop', 'Rebote'], ['blur', 'Desenfoque'], ['slide', 'Deslizar'], ['draw', 'Dibujar']];
 const F = (key, label, type, extra = {}) => ({ key, label, type, ...extra });
+const MEDIA_FIELDS = [
+  F('zoom', 'Zoom', 'number', { step: 0.1, def: () => 1 }),
+  F('fx', 'Enfoque X (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
+  F('fy', 'Enfoque Y (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
+  F('trim', 'Inicio del clip (s)', 'number', { step: 0.1 }), F('speed', 'Velocidad', 'number', { step: 0.1 }),
+];
 const SCHEMA = {
   text: [F('text', 'Texto', 'textarea'), F('font', 'Fuente', 'select', { options: [['title', 'Archivo Black'], ['body', 'Lato']] }),
     F('size', 'Tamaño', 'number', { step: 2 }), F('color', 'Color', 'color'), F('accent', 'Acento *palabra*', 'color'),
@@ -296,10 +302,9 @@ const SCHEMA = {
     F('color', 'Color', 'color'), F('color2', 'Color 2', 'color'), F('radius', 'Radio', 'number', { step: 4 }), F('stroke', 'Grosor', 'number', { step: 1 }),
     F('label', 'Texto del botón', 'text'), F('labelColor', 'Color texto', 'color'), F('arrowIcon', 'Flecha en botón', 'checkbox'), F('shadow', 'Sombra', 'checkbox')],
   image: [F('asset', 'Medio', 'asset'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }),
-    F('radius', 'Radio', 'number', { step: 4 }), F('shadow', 'Sombra', 'checkbox'), F('trim', 'Inicio del clip (s)', 'number', { step: 0.1 }), F('speed', 'Velocidad', 'number', { step: 0.1 })],
+    F('radius', 'Radio', 'number', { step: 4 }), F('shadow', 'Sombra', 'checkbox'), ...MEDIA_FIELDS],
   mockup: [F('kind', 'Dispositivo', 'select', { options: [['browser', 'Navegador'], ['phone', 'Celular']] }), F('asset', 'Medio', 'asset'),
-    F('url', 'URL (navegador)', 'text'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }),
-    F('trim', 'Inicio del clip (s)', 'number', { step: 0.1 }), F('speed', 'Velocidad', 'number', { step: 0.1 })],
+    F('url', 'URL (navegador)', 'text'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }), ...MEDIA_FIELDS],
   logo: [F('variant', 'Versión', 'select', { options: [['dark', 'Negro'], ['light', 'Marfil']] })],
 };
 const SWATCHES = [BRAND.black, BRAND.ivory, BRAND.coral, BRAND.sun, BRAND.green, BRAND.sky, '#FFFFFF'];
