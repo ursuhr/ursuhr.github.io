@@ -449,7 +449,9 @@ export async function seekVideosExact(project, t) {
     const target = Math.min((l.trim || 0) + (t - l.start) * (l.speed || 1), Math.max(0, (a.el.duration || 1e9) - 0.001));
     if (Math.abs(a.el.currentTime - target) < 0.001) continue;
     jobs.push(new Promise((res) => {
-      const done = () => { a.el.removeEventListener('seeked', done); res(); };
+      // Si el navegador no avisa que terminó de posicionar el video, seguimos igual en vez de quedar pegados.
+      const done = () => { clearTimeout(timer); a.el.removeEventListener('seeked', done); res(); };
+      const timer = setTimeout(done, 1500);
       a.el.addEventListener('seeked', done);
       a.el.currentTime = target;
     }));

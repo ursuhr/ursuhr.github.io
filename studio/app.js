@@ -82,8 +82,17 @@ function setProject(p, keepAudio = false) {
   $('#projName').value = p.name || 'Reel';
   $('#durInput').value = p.duration;
   refreshAll();
-  const missing = [...new Set(p.layers.filter((l) => l.asset && !assets.has(l.asset)).map((l) => l.asset))];
-  if (missing.length) toast('Faltan medios: ' + missing.join(', '));
+  if (!booting) warnMissing();
+}
+// Avisa de los archivos que el proyecto usa y no están cargados (los sonidos se buscan en su propia biblioteca).
+let booting = true;
+function warnMissing() {
+  const miss = new Set();
+  for (const l of S.P.layers) {
+    if (!l.asset) continue;
+    if (!(l.type === 'sound' ? sounds : assets).has(l.asset)) miss.add(l.asset);
+  }
+  if (miss.size) toast('Faltan estos archivos: ' + [...miss].join(', ') + '. Súbelos con "Medios".');
 }
 
 function blankProject() {
@@ -622,19 +631,22 @@ async function clearFiles() {
   try { const db = await idb(); await new Promise((res) => { const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').clear(); tx.oncomplete = res; }); } catch { /* nada que borrar */ }
 }
 async function registerMedia(blob, name) {
-  const type = blob.type || ''; const url = URL.createObjectURL(blob);
+  let type = blob.type || ''; const url = URL.createObjectURL(blob);
+  if (!type && /\.(mov|mp4|m4v|webm)$/i.test(name)) type = 'video/mp4'; // algunos .mov llegan sin tipo
   if (type.startsWith('image/')) {
     const img = new Image(); img.src = url; await img.decode().catch(() => {});
     assets.set(name, { kind: 'image', el: img, name }); return 'image';
   }
   if (type.startsWith('video/')) {
     const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
-    await new Promise((res) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', res, { once: true }); });
+    // Espera a que el video cargue, pero no más de 12 s: si el navegador no puede leerlo, se avisa en vez de quedar pegado.
+    await new Promise((res) => { const t = setTimeout(res, 12000); const ok = () => { clearTimeout(t); res(); }; v.addEventListener('loadeddata', ok, { once: true }); v.addEventListener('error', ok, { once: true }); });
+    if (!v.videoWidth) { toast(`El navegador no puede leer "${name}". Si es un .mov de Mac, expórtalo desde QuickTime como 1080p o pásamelo y lo convierto.`); URL.revokeObjectURL(url); return 'fail'; }
     v.addEventListener('seeked', () => { if (!S.exporting) paint(); });
     assets.set(name, { kind: 'video', el: v, name, duration: v.duration }); return 'video';
   }
   if (type.startsWith('audio/')) {
-    try { const buffer = await decodeSound(await blob.arrayBuffer()); sounds.set(name, { name, label: name, buffer }); return 'sound'; } catch { toast(`No pude leer ${name}`); return null; }
+    try { const buffer = await decodeSound(await blob.arrayBuffer()); sounds.set(name, { name, label: name, buffer }); return 'sound'; } catch { toast(`No pude leer ${name}`); return 'fail'; }
   }
   return null;
 }
@@ -648,8 +660,8 @@ async function restoreFiles() {
   let n = 0;
   for (const r of await allFiles()) {
     try {
-      if (r.kind === 'voice') { await setVoice(r.blob, r.name); n++; }
-      else if (await registerMedia(r.blob, r.name)) n++;
+      if (r.kind === 'voice') { await Promise.race([setVoice(r.blob, r.name), new Promise((ok) => setTimeout(ok, 12000))]); n++; }
+      else { const k = await Promise.race([registerMedia(r.blob, r.name), new Promise((ok) => setTimeout(() => ok(null), 12000))]); if (k && k !== 'fail') n++; }
     } catch { /* archivo dañado: se ignora */ }
   }
   if (n) { refreshAll(); toast(`Recuperé ${n} archivo(s) de tu última sesión`); }
@@ -657,16 +669,18 @@ async function restoreFiles() {
 
 // ---------- medios y audio ----------
 async function importMedia(files, target) {
-  let lastName = ''; let audioAdded = '';
+  let lastName = ''; let audioAdded = ''; let failed = false;
+  if ([...files].some((f) => f.size > 20e6)) toast('Cargando el video, puede tardar unos segundos…');
   for (const f of files) {
     const kind = await registerMedia(f, f.name);
+    if (kind === 'fail') { failed = true; continue; } // registerMedia ya explicó qué pasó
     if (!kind) continue;
     saveFile(`m:${f.name}`, f, kind, f.name);
     if (kind === 'sound') { audioAdded = f.name; continue; }
     lastName = f.name;
   }
   if (!lastName && audioAdded) { toast(`Sonido "${audioAdded}" cargado. Agrégalo con el botón ♪ Sonido.`); refreshAll(); return; }
-  if (!lastName) { toast('Formato no compatible'); return; }
+  if (!lastName) { if (!failed) toast('Formato no compatible'); return; }
   const l = target || sel();
   if (l && (l.type === 'image' || l.type === 'mockup')) { l.asset = lastName; commit(); toast(`"${lastName}" asignado a ${l.name}`); }
   else toast(`"${lastName}" cargado. Selecciona un mockup o imagen y elígelo en "Medio", o arrástralo encima.`);
@@ -902,6 +916,7 @@ function refreshAll(tl = true) {
     } else setProject(saved);
   } else await loadTemplate('proceso');
   await restoreFiles();
+  booting = false; warnMissing();
   fitStage(); refreshAll();
   window.__studio = { S, play, pause, seek, doExport, addLayer, select, assets, importMedia, sounds, addSound };
 })();
