@@ -1,6 +1,6 @@
 {
  "template": "proceso",
- "rev": 5,
+ "rev": 6,
  "name": "Reel · Cómo trabajo",
  "width": 1080,
  "height": 1920,
@@ -404,8 +404,8 @@
   {
    "id": "l20",
    "type": "mockup",
-   "name": "Navegador · Figma",
-   "start": 20.5,
+   "name": "Navegador · Tablero de competencia",
+   "start": 15.9,
    "end": 25.25,
    "x": 540,
    "y": 1130,
@@ -418,9 +418,9 @@
    "animDur": 0.45,
    "kind": "browser",
    "asset": "",
-   "url": "figma.com",
+   "url": "notion.so",
    "fit": "cover",
-   "placeholder": "Aquí va tu prototipo de Figma"
+   "placeholder": "Aquí va tu tablero de competencia (Notion)"
   },
   {
    "id": "l21",
