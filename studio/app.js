@@ -79,7 +79,6 @@ function setProject(p, keepAudio = false) {
   S.P = p; S.sel = null; S.t = 0; pause();
   p.layers.forEach((l) => { l.id = l.id || uid(); });
   S.hist = []; S.hi = -1; commit();
-  if (!keepAudio) { audioEl.removeAttribute('src'); S.audio = { buffer: null, name: '' }; }
   $('#projName').value = p.name || 'Reel';
   $('#durInput').value = p.duration;
   refreshAll();
@@ -593,23 +592,69 @@ $('#btnPlay').onclick = () => (S.playing ? pause() : play());
 $('#btnStart').onclick = () => { pause(); seek(0); };
 $('#zoom').oninput = (e) => { S.zoom = +e.target.value; refreshTimeline(); };
 
+// ---------- archivos guardados en el navegador (IndexedDB) ----------
+// Las grabaciones, los sonidos importados y la voz se guardan aquí para que sigan al recargar la página.
+function idb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('ursulahr-studio-files', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('files', { keyPath: 'key' });
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function saveFile(key, blob, kind, name) {
+  try {
+    const db = await idb();
+    await new Promise((res, rej) => { const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').put({ key, kind, name, type: blob.type, blob }); tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+  } catch { /* sin almacenamiento: el archivo vive solo en esta sesión */ }
+}
+async function allFiles() {
+  try { const db = await idb(); return await new Promise((res, rej) => { const q = db.transaction('files').objectStore('files').getAll(); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); } catch { return []; }
+}
+async function clearFiles() {
+  try { const db = await idb(); await new Promise((res) => { const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').clear(); tx.oncomplete = res; }); } catch { /* nada que borrar */ }
+}
+async function registerMedia(blob, name) {
+  const type = blob.type || ''; const url = URL.createObjectURL(blob);
+  if (type.startsWith('image/')) {
+    const img = new Image(); img.src = url; await img.decode().catch(() => {});
+    assets.set(name, { kind: 'image', el: img, name }); return 'image';
+  }
+  if (type.startsWith('video/')) {
+    const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
+    await new Promise((res) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', res, { once: true }); });
+    v.addEventListener('seeked', () => { if (!S.exporting) paint(); });
+    assets.set(name, { kind: 'video', el: v, name, duration: v.duration }); return 'video';
+  }
+  if (type.startsWith('audio/')) {
+    try { const buffer = await decodeSound(await blob.arrayBuffer()); sounds.set(name, { name, label: name, buffer }); return 'sound'; } catch { toast(`No pude leer ${name}`); return null; }
+  }
+  return null;
+}
+async function setVoice(blob, name) {
+  const buffer = await decodeSound(await blob.arrayBuffer());
+  S.audio = { buffer, name };
+  audioEl.src = URL.createObjectURL(blob);
+  return buffer;
+}
+async function restoreFiles() {
+  let n = 0;
+  for (const r of await allFiles()) {
+    try {
+      if (r.kind === 'voice') { await setVoice(r.blob, r.name); n++; }
+      else if (await registerMedia(r.blob, r.name)) n++;
+    } catch { /* archivo dañado: se ignora */ }
+  }
+  if (n) { refreshAll(); toast(`Recuperé ${n} archivo(s) de tu última sesión`); }
+}
+
 // ---------- medios y audio ----------
 async function importMedia(files, target) {
   let lastName = ''; let audioAdded = '';
   for (const f of files) {
-    const url = URL.createObjectURL(f);
-    if (f.type.startsWith('image/')) {
-      const img = new Image(); img.src = url; await img.decode().catch(() => {});
-      assets.set(f.name, { kind: 'image', el: img, name: f.name });
-    } else if (f.type.startsWith('video/')) {
-      const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
-      await new Promise((res) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', res, { once: true }); });
-      v.addEventListener('seeked', () => { if (!S.exporting) paint(); });
-      assets.set(f.name, { kind: 'video', el: v, name: f.name, duration: v.duration });
-    } else if (f.type.startsWith('audio/')) {
-      try { const buffer = await decodeSound(await f.arrayBuffer()); sounds.set(f.name, { name: f.name, label: f.name, buffer }); audioAdded = f.name; } catch { toast(`No pude leer ${f.name}`); }
-      continue;
-    } else continue;
+    const kind = await registerMedia(f, f.name);
+    if (!kind) continue;
+    saveFile(`m:${f.name}`, f, kind, f.name);
+    if (kind === 'sound') { audioAdded = f.name; continue; }
     lastName = f.name;
   }
   if (!lastName && audioAdded) { toast(`Sonido "${audioAdded}" cargado. Agrégalo con el botón ♪ Sonido.`); refreshAll(); return; }
@@ -635,11 +680,8 @@ $('#fileAudio').onchange = async (e) => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   try {
     pause();
-    const ab = await f.arrayBuffer();
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const buf = await ac.decodeAudioData(ab.slice(0)); ac.close();
-    S.audio = { buffer: buf, name: f.name };
-    audioEl.src = URL.createObjectURL(f);
+    const buf = await setVoice(f, f.name);
+    saveFile('voice', f, 'voice', f.name);
     const d = round(buf.duration, 1);
     if (Math.abs(d - S.P.duration) > 0.5 && confirm(`El audio dura ${d} s y el reel ${S.P.duration} s.\n¿Escalar todos los tiempos para que calcen con el audio?\n(Después puedes afinar cada escena en la línea de tiempo.)`)) {
       const k = d / S.P.duration;
@@ -676,6 +718,7 @@ $('#btnScript').onclick = () => {
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
+  ['Borrar archivos guardados', async () => { if (confirm('Se borran las grabaciones, sonidos y la voz guardados en este navegador. ¿Continuar?')) { await clearFiles(); toast('Listo. Recarga la página para empezar limpio.'); } }],
 ]);
 $('#btnOpen').onclick = () => $('#fileProject').click();
 $('#fileProject').onchange = async (e) => {
@@ -834,6 +877,7 @@ function refreshAll(tl = true) {
       setProject(tpl);
     } else setProject(saved);
   } else await loadTemplate('proceso');
+  await restoreFiles();
   fitStage(); refreshAll();
   window.__studio = { S, play, pause, seek, doExport, addLayer, select, assets, importMedia, sounds, addSound };
 })();
