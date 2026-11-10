@@ -400,6 +400,7 @@ export function renderFrame(ctx, project, t) {
 
 // ---------- geometría para el editor ----------
 export function layerBounds(l) {
+  if (l.type === 'sound') return { w: 0, h: 0 };
   if (l.type === 'text') return { w: l.w, h: layoutText(measureCtx, l).h };
   if (l.type === 'caption') return { w: Math.min(l.w, 900), h: (l.size || 54) * 1.9 };
   return { w: l.w, h: l.h };
@@ -408,7 +409,7 @@ export function layerBounds(l) {
 export function hitTest(project, t, px, py) {
   for (let i = project.layers.length - 1; i >= 0; i--) {
     const l = project.layers[i];
-    if (l.locked || !layerActive(l, t)) continue;
+    if (l.locked || l.type === 'sound' || !layerActive(l, t)) continue;
     const b = layerBounds(l);
     const a = -((l.rot || 0) * Math.PI) / 180;
     const dx = px - l.x, dy = py - l.y;

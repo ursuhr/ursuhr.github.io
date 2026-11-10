@@ -18,6 +18,26 @@ const uid = () => 'l' + Math.random().toString(36).slice(2, 8);
 const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
 
 const FPS = 30;
+// Biblioteca de sonidos: nombre -> { name, label, buffer }. Incluye los de assets/sfx y los que importes.
+const sounds = new Map();
+let AC = null;
+const getAC = () => { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); return AC; };
+let liveSrc = [];
+const decodeSound = async (ab) => getAC().decodeAudioData(ab.slice(0));
+async function loadSfxLibrary() {
+  try {
+    const r = await fetch('assets/sfx/sfx.json', { cache: 'no-cache' });
+    if (!r.ok) return;
+    const { sonidos } = await r.json();
+    await Promise.all(sonidos.map(async (x) => {
+      try {
+        const rr = await fetch(`assets/sfx/${x.archivo}`); const buffer = await decodeSound(await rr.arrayBuffer());
+        const name = x.archivo.replace(/\.mp3$/, '');
+        sounds.set(name, { name, label: `${name} · ${x.uso}`, buffer });
+      } catch { /* sonido no disponible */ }
+    }));
+  } catch { /* sin biblioteca */ }
+}
 const LS_KEY = 'ursulahr-studio-project-v1';
 const cv = $('#cv'); const ctx = cv.getContext('2d');
 const audioEl = new Audio(); audioEl.preload = 'auto';
@@ -90,7 +110,7 @@ async function loadTemplate(name) {
 }
 
 // ---------- capas ----------
-const TYPE_ICON = { text: 'T', shape: '◆', image: 'I', mockup: 'M', caption: 'S', logo: 'HR' };
+const TYPE_ICON = { text: 'T', shape: '◆', image: 'I', mockup: 'M', caption: 'S', logo: 'HR', sound: '♪' };
 const NEW_LAYER = {
   text: ['Texto', { type: 'text', text: 'Tu *título* aquí', font: 'title', size: 96, color: BRAND.black, accent: BRAND.coral, align: 'left', lh: 1.05, w: 880, h: 200, animIn: 'rise', animOut: 'fade' }],
   caption: ['Subtítulos', { type: 'caption', text: 'Escribe aquí lo que dice la voz', size: 54, y: 1440, w: 960, h: 110, capStyle: 'pill', maxWords: 4, accent: BRAND.coral, animIn: 'fade' }],
@@ -114,6 +134,36 @@ function addLayer(kind) {
   };
   if (l.end - l.start < 0.5) l.start = Math.max(0, l.end - 4);
   S.P.layers.push(l); S.sel = l.id; commit(); refreshAll();
+}
+function addSound(name) {
+  const snd = sounds.get(name); if (!snd) return;
+  const start = round(S.t);
+  const l = { id: uid(), type: 'sound', name: `Sonido · ${name}`, asset: name, volume: 0.35, start, end: round(Math.min(S.P.duration, start + snd.buffer.duration), 2),
+    x: 0, y: 0, w: 0, h: 0, rot: 0, opacity: 1, animIn: 'none', animOut: 'none', animDur: 0.45 };
+  S.P.layers.push(l); S.sel = l.id; commit(); refreshAll(); previewSound(l);
+}
+function previewSound(l) {
+  const snd = sounds.get(l.asset); if (!snd) return;
+  const c = getAC(); if (c.state === 'suspended') c.resume();
+  const src = c.createBufferSource(); src.buffer = snd.buffer;
+  const g = c.createGain(); g.gain.value = l.volume ?? 0.35; src.connect(g).connect(c.destination); src.start();
+}
+function stopSounds() { for (const x of liveSrc) { try { x.stop(); } catch { /* ya terminó */ } } liveSrc = []; }
+function scheduleSounds(t0) {
+  stopSounds();
+  const c = getAC(); if (c.state === 'suspended') c.resume();
+  const now = c.currentTime;
+  for (const l of S.P.layers) {
+    if (l.type !== 'sound' || l.hidden) continue;
+    const snd = sounds.get(l.asset); if (!snd) continue;
+    const end = Math.min(l.end, l.start + snd.buffer.duration);
+    if (end <= t0) continue;
+    const src = c.createBufferSource(); src.buffer = snd.buffer;
+    const g = c.createGain(); g.gain.value = l.volume ?? 0.35; src.connect(g).connect(c.destination);
+    const from = Math.max(l.start, t0);
+    src.start(now + Math.max(0, l.start - t0), Math.max(0, t0 - l.start), Math.max(0.01, end - from));
+    liveSrc.push(src);
+  }
 }
 function dupLayer() {
   const l = sel(); if (!l) return;
@@ -160,7 +210,7 @@ function updateOverlay() {
   const sc = S.sc;
   Object.assign(safe.style, { left: `${60 * sc}px`, top: `${250 * sc}px`, width: `${900 * sc}px`, height: `${1250 * sc}px` });
   safe.classList.toggle('on', $('#chkSafe').checked);
-  const l = sel(); if (!l) return;
+  const l = sel(); if (!l || l.type === 'sound') return;
   const b = layerBounds(l);
   const box = el('div', { class: 'sel' });
   Object.assign(box.style, { left: `${(l.x - b.w / 2) * sc}px`, top: `${(l.y - b.h / 2) * sc}px`, width: `${b.w * sc}px`, height: `${b.h * sc}px`, transform: `rotate(${l.rot || 0}deg)` });
@@ -272,6 +322,11 @@ function openMenu(anchor, items) {
   m.style.left = `${Math.min(r.left, innerWidth - 220)}px`; m.style.top = `${r.bottom + 6}px`;
   setTimeout(() => document.addEventListener('pointerdown', function h(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('pointerdown', h); } }), 0);
 }
+$('#btnSound').onclick = (e) => {
+  const items = [...sounds.values()].map((x) => [x.label, () => addSound(x.name)]);
+  if (!items.length) { toast('Aún no hay sonidos. Importa uno con "Medios".'); return; }
+  openMenu(e.currentTarget, items);
+};
 $('#btnAdd').onclick = (e) => openMenu(e.currentTarget, [
   ['Texto', () => addLayer('text')], ['Subtítulos', () => addLayer('caption')],
   ['Mockup navegador', () => addLayer('browser')], ['Mockup celular', () => addLayer('phone')],
@@ -306,6 +361,7 @@ const SCHEMA = {
   mockup: [F('kind', 'Dispositivo', 'select', { options: [['browser', 'Navegador'], ['phone', 'Celular']] }), F('asset', 'Medio', 'asset'),
     F('url', 'URL (navegador)', 'text'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }), ...MEDIA_FIELDS],
   logo: [F('variant', 'Versión', 'select', { options: [['dark', 'Negro'], ['light', 'Marfil']] })],
+  sound: [F('asset', 'Sonido', 'asset', { sound: true }), F('volume', 'Volumen (0 a 1,5)', 'number', { step: 0.05, def: () => 0.35 })],
 };
 const SWATCHES = [BRAND.black, BRAND.ivory, BRAND.coral, BRAND.sun, BRAND.green, BRAND.sky, '#FFFFFF'];
 let inspInputs = {};
@@ -346,12 +402,13 @@ function fillValues() {
     const v = get();
     if (f.type === 'checkbox') input.checked = !!v;
     else if (f.type === 'asset') {
-      const names = [...assets.keys()];
+      const reg = f.sound ? sounds : assets;
+      const names = [...reg.keys()];
       const cur = l.asset || '';
       if (input.dataset.names !== names.join('|') + '|' + cur) {
         input.innerHTML = '';
         input.append(el('option', { value: '', text: '— ninguno —' }));
-        [...new Set([...names, ...(cur ? [cur] : [])])].forEach((n) => input.append(el('option', { value: n, text: assets.has(n) ? n : `${n} (falta)` })));
+        [...new Set([...names, ...(cur ? [cur] : [])])].forEach((n) => input.append(el('option', { value: n, text: reg.has(n) ? (f.sound ? reg.get(n).label : n) : `${n} (falta)` })));
         input.dataset.names = names.join('|') + '|' + cur;
       }
       input.value = cur;
@@ -396,6 +453,16 @@ function renderInspector() {
   if (l.type === 'text') box.append(el('div', { class: 'hint', text: 'Rodea una palabra con *asteriscos* para pintarla con el color de acento.' }));
   if (l.type === 'caption') box.append(el('div', { class: 'hint', text: 'Las palabras se reparten entre Inicio y Fin según su largo. Ajusta esos tiempos para calzar con la voz.' }));
 
+  if (l.type === 'sound') {
+    box.append(el('div', { style: 'margin-top:8px' }, el('button', { class: 'btn small', text: '▶ Probar sonido', onclick: () => previewSound(l) })));
+    box.append(el('div', { class: 'hint', text: 'El sonido suena desde "In" y se corta en "Out". Mantén el volumen bajo: la voz tiene que ser lo principal.' }));
+    box.append(el('h4', { text: 'Tiempo' }));
+    const gs = el('div', { class: 'grid2' }); gs.append(numField(l, 'start', 'In', 0.05), numField(l, 'end', 'Out', 0.05)); box.append(gs);
+    box.append(el('h4', { text: 'Acciones' }),
+      el('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }, el('button', { class: 'btn small', text: 'Duplicar', onclick: dupLayer }), el('button', { class: 'btn small', text: 'Eliminar', onclick: delLayer })));
+    fillValues();
+    return;
+  }
   box.append(el('h4', { text: 'Posición y tamaño' }));
   const g = el('div', { class: 'grid2' });
   const compact = (key, label, step) => { const r = numField(l, key, label, step); return r; };
@@ -494,7 +561,7 @@ function startBar(e, l, bar) {
 function seek(t) {
   S.t = clamp(t, 0, S.P.duration);
   if (S.audio.buffer) { try { audioEl.currentTime = S.t; } catch { /* aún sin cargar */ } }
-  if (S.playing) S.clock = { base: S.t, start: performance.now() };
+  if (S.playing) { S.clock = { base: S.t, start: performance.now() }; scheduleSounds(S.t); }
   paint();
 }
 function play() {
@@ -503,18 +570,19 @@ function play() {
   S.playing = true; S.clock = { base: S.t, start: performance.now() };
   $('#btnPlay').textContent = '❚❚';
   if (S.audio.buffer) { audioEl.currentTime = S.t; audioEl.play().catch(() => {}); }
+  scheduleSounds(S.t);
   requestAnimationFrame(tick);
 }
 function pause() {
   if (!S.playing) { audioEl.pause(); return; }
-  S.playing = false; audioEl.pause(); $('#btnPlay').textContent = '▶';
+  S.playing = false; audioEl.pause(); stopSounds(); $('#btnPlay').textContent = '▶';
   syncVideos(S.P, S.t, false);
 }
 function tick(now) {
   if (!S.playing) return;
   const t = S.clock.base + (now - S.clock.start) / 1000;
   if (t >= S.P.duration) {
-    if ($('#chkLoop').checked) { S.playing = false; play(); S.t = 0; S.clock = { base: 0, start: performance.now() }; if (S.audio.buffer) audioEl.currentTime = 0; requestAnimationFrame(tick); return; }
+    if ($('#chkLoop').checked) { S.playing = false; S.t = 0; play(); return; }
     pause(); S.t = S.P.duration - 0.001; paint(); return;
   }
   S.t = t;
@@ -527,7 +595,7 @@ $('#zoom').oninput = (e) => { S.zoom = +e.target.value; refreshTimeline(); };
 
 // ---------- medios y audio ----------
 async function importMedia(files, target) {
-  let lastName = '';
+  let lastName = ''; let audioAdded = '';
   for (const f of files) {
     const url = URL.createObjectURL(f);
     if (f.type.startsWith('image/')) {
@@ -538,9 +606,13 @@ async function importMedia(files, target) {
       await new Promise((res) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', res, { once: true }); });
       v.addEventListener('seeked', () => { if (!S.exporting) paint(); });
       assets.set(f.name, { kind: 'video', el: v, name: f.name, duration: v.duration });
+    } else if (f.type.startsWith('audio/')) {
+      try { const buffer = await decodeSound(await f.arrayBuffer()); sounds.set(f.name, { name: f.name, label: f.name, buffer }); audioAdded = f.name; } catch { toast(`No pude leer ${f.name}`); }
+      continue;
     } else continue;
     lastName = f.name;
   }
+  if (!lastName && audioAdded) { toast(`Sonido "${audioAdded}" cargado. Agrégalo con el botón ♪ Sonido.`); refreshAll(); return; }
   if (!lastName) { toast('Formato no compatible'); return; }
   const l = target || sel();
   if (l && (l.type === 'image' || l.type === 'mockup')) { l.asset = lastName; commit(); toast(`"${lastName}" asignado a ${l.name}`); }
@@ -622,6 +694,21 @@ let cancelExport = false;
 function rebindExportModal() { const c = $('#expCancel'); if (c) c.onclick = () => { cancelExport = true; }; }
 rebindExportModal();
 
+async function mixAudio() {
+  const live = S.P.layers.filter((l) => l.type === 'sound' && !l.hidden && sounds.has(l.asset));
+  if (!S.audio.buffer && !live.length) return null;
+  const sr = S.audio.buffer ? S.audio.buffer.sampleRate : 44100;
+  const oc = new OfflineAudioContext(2, Math.ceil(S.P.duration * sr), sr);
+  if (S.audio.buffer) { const v = oc.createBufferSource(); v.buffer = S.audio.buffer; v.connect(oc.destination); v.start(0); }
+  for (const l of live) {
+    const buf = sounds.get(l.asset).buffer;
+    const src = oc.createBufferSource(); src.buffer = buf;
+    const g = oc.createGain(); g.gain.value = l.volume ?? 0.35; src.connect(g).connect(oc.destination);
+    src.start(l.start, 0, Math.max(0.01, Math.min(l.end - l.start, buf.duration)));
+  }
+  return oc.startRendering();
+}
+
 function trimAudio(buf, dur) {
   const frames = Math.min(buf.length, Math.round(dur * buf.sampleRate));
   if (frames === buf.length) return buf;
@@ -654,13 +741,14 @@ async function doExport() {
     const vsrc = new MB.CanvasSource(cvx, { codec, bitrate: MB.QUALITY_HIGH });
     output.addVideoTrack(vsrc, { frameRate: FPS });
     let asrc = null; let audioCodec = '';
-    if (S.audio.buffer) {
-      const ac = await MB.getFirstEncodableAudioCodec(mp4 ? ['aac', 'opus'] : ['opus', 'vorbis'], { numberOfChannels: S.audio.buffer.numberOfChannels, sampleRate: S.audio.buffer.sampleRate });
+    const mix = await mixAudio();
+    if (mix) {
+      const ac = await MB.getFirstEncodableAudioCodec(mp4 ? ['aac', 'opus'] : ['opus', 'vorbis'], { numberOfChannels: mix.numberOfChannels, sampleRate: mix.sampleRate });
       if (ac) { audioCodec = ac; asrc = new MB.AudioBufferSource({ codec: ac, bitrate: MB.QUALITY_HIGH }); output.addAudioTrack(asrc); }
-      else toast('No pude codificar el audio: el video saldrá sin voz');
+      else toast('No pude codificar el audio: el video saldrá sin sonido');
     }
     await output.start();
-    const audioJob = asrc ? asrc.add(trimAudio(S.audio.buffer, S.P.duration)) : null;
+    const audioJob = asrc ? asrc.add(mix) : null;
     const N = Math.ceil(S.P.duration * FPS);
     for (let i = 0; i < N; i++) {
       if (cancelExport) { await output.cancel(); S.exporting = false; modal.classList.remove('on'); toast('Exportación cancelada'); paint(); return; }
@@ -678,7 +766,7 @@ async function doExport() {
     const fname = `${(S.P.name || 'reel').replace(/[^\w\-]+/g, '_')}.${mp4 ? 'mp4' : 'webm'}`;
     $('#expBar').style.width = '100%'; $('#expTitle').textContent = 'Listo';
     const warn = mp4 && audioCodec === 'opus' ? ' Ojo: el audio quedó en Opus y Instagram podría rechazarlo. Exporta desde Google Chrome en Mac para obtener AAC.' : '';
-    msg(`${(blob.size / 1e6).toFixed(1)} MB · ${mp4 ? 'MP4 (H.264)' : 'WebM (VP9)'}${asrc ? ` con voz (${audioCodec})` : ' sin audio'}.${warn}`);
+    msg(`${(blob.size / 1e6).toFixed(1)} MB · ${mp4 ? 'MP4 (H.264)' : 'WebM (VP9)'}${asrc ? ` con audio (${audioCodec})` : ' sin audio'}.${warn}`);
     const acts = $('#expActs'); acts.innerHTML = '';
     const link = el('a', { class: 'btn primary', href: URL.createObjectURL(blob), download: fname, text: 'Descargar' });
     acts.append(el('button', { class: 'btn', text: 'Cerrar', onclick: () => modal.classList.remove('on') }), link);
@@ -728,6 +816,7 @@ function refreshAll(tl = true) {
 (async () => {
   await fontsReady();
   fitStage();
+  await loadSfxLibrary();
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch { /* ignorar */ }
   if (saved && Array.isArray(saved.layers)) {
@@ -736,9 +825,15 @@ function refreshAll(tl = true) {
     let tpl = null;
     if (tid) { try { const r = await fetch(`projects/${tid}.json`, { cache: 'no-cache' }); if (r.ok) tpl = await r.json(); } catch { /* sin red */ } }
     if (tpl && (tpl.rev || 0) > (saved.rev || 0)
-      && confirm(`Hay una versión nueva de la plantilla "${tpl.name}".\n\nAceptar: cargarla (reemplaza el proyecto que tienes ahora; vuelve a subir tu audio después).\nCancelar: seguir con tu proyecto actual.`)) setProject(tpl);
-    else setProject(saved);
+      && confirm(`Hay una versión nueva de la plantilla "${tpl.name}".\n\nAceptar: cargarla. Se conservan las grabaciones que asignaste a los mockups, pero se reemplaza lo demás (vuelve a subir tu audio).\nCancelar: seguir con tu proyecto actual.`)) {
+      const byName = new Map(saved.layers.map((x) => [x.name, x]));
+      tpl.layers.forEach((x) => {
+        const o = (x.type === 'mockup' || x.type === 'image') && byName.get(x.name);
+        if (o) ['asset', 'url', 'speed', 'trim', 'zoom', 'fx', 'fy', 'fit'].forEach((k) => { if (o[k] !== undefined) x[k] = o[k]; });
+      });
+      setProject(tpl);
+    } else setProject(saved);
   } else await loadTemplate('proceso');
   fitStage(); refreshAll();
-  window.__studio = { S, play, pause, seek, doExport, addLayer, select, assets, importMedia };
+  window.__studio = { S, play, pause, seek, doExport, addLayer, select, assets, importMedia, sounds, addSound };
 })();

@@ -7,6 +7,6 @@
     { "archivo": "pop-2.mp3", "uso": "alternativa de pop", "prompt": "Soft bubbly pop, short, clean, friendly interface sound" },
     { "archivo": "tick-1.mp3", "uso": "números de cada paso", "prompt": "Single crisp soft tick, subtle button click, close-mic, dry" },
     { "archivo": "chime-1.mp3", "uso": "botón final de WhatsApp", "prompt": "Gentle bright two-note chime, short, warm, positive notification" },
-    { "archivo": "chime-2.mp3", "uso": "alternativa de campanita (3 s)", "prompt": "Gentle bright two-note chime, short, warm, positive notification" }
+    { "archivo": "chime-2.mp3", "uso": "alternativa de campanita (1,8 s)", "prompt": "Gentle bright two-note chime, short, warm, positive notification" }
   ]
 }

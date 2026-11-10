@@ -21,14 +21,14 @@
   <button class="btn" id="btnOpen">Abrir</button>
   <button class="btn" id="btnSave">Guardar</button>
   <button class="btn primary" id="btnExport">Exportar video</button>
-  <input type="file" id="fileMedia" accept="image/*,video/*" multiple hidden>
+  <input type="file" id="fileMedia" accept="image/*,video/*,audio/*" multiple hidden>
   <input type="file" id="fileAudio" accept="audio/*,video/*" hidden>
   <input type="file" id="fileProject" accept=".json,application/json" hidden>
 </header>
 
 <main class="work">
   <aside class="side">
-    <div class="head"><b class="title">Capas</b><button class="btn small" id="btnAdd">+ Agregar</button></div>
+    <div class="head"><b class="title">Capas</b><span><button class="btn small" id="btnSound">♪ Sonido</button> <button class="btn small" id="btnAdd">+ Agregar</button></span></div>
     <ul id="layerList"></ul>
   </aside>
 
