@@ -55,11 +55,16 @@ function anim(l, t) {
 // ---------- texto ----------
 function parseTokens(text) {
   const out = [];
+  let ends = true; // el texto anterior terminó en espacio: si no, la palabra siguiente va pegada (p. ej. "*web*?")
   text.split('*').forEach((seg, i) => {
     const accent = i % 2 === 1;
     seg.split('\n').forEach((line, li) => {
-      if (li > 0) out.push({ nl: true });
-      line.split(/\s+/).filter(Boolean).forEach((w) => out.push({ text: w, accent }));
+      if (li > 0) { out.push({ nl: true }); ends = true; }
+      line.split(/\s+/).forEach((w, wi) => {
+        if (!w) return;
+        out.push({ text: w, accent, glue: wi === 0 && !ends && out.length > 0 && !out[out.length - 1].nl });
+      });
+      if (line.length) ends = /\s$/.test(line);
     });
   });
   return out;
@@ -83,9 +88,10 @@ function layoutText(ctx, l) {
   for (const tk of toks) {
     if (tk.nl) { push(); continue; }
     const w = ctx.measureText(tk.text).width;
-    if (line.words.length && line.w + space + w > l.w) push();
-    line.w += (line.words.length ? space : 0) + w;
-    line.words.push({ ...tk, w });
+    if (line.words.length && !tk.glue && line.w + space + w > l.w) push();
+    const sp = line.words.length && !tk.glue ? space : 0;
+    line.w += sp + w;
+    line.words.push({ ...tk, w, sp });
   }
   push();
   const lh = size * (l.lh || 1.05);
@@ -103,9 +109,10 @@ function drawText(ctx, l) {
     const y = -h / 2 + (i + 0.5) * lh;
     let x = align === 'center' ? -ln.w / 2 : align === 'right' ? l.w / 2 - ln.w : -l.w / 2;
     for (const wd of ln.words) {
+      x += wd.sp;
       ctx.fillStyle = wd.accent ? (l.accent || BRAND.coral) : (l.color || BRAND.black);
       ctx.fillText(wd.text, x, y);
-      x += wd.w + space;
+      x += wd.w;
     }
   });
 }
