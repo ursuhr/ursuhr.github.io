@@ -1,6 +1,6 @@
 {
  "template": "millon-foto",
- "rev": 1,
+ "rev": 5,
  "name": "Reel · Un millón por cambiar una foto",
  "width": 1080,
  "height": 1920,
@@ -90,13 +90,12 @@
    "w": 1100,
    "h": 1100,
    "rot": 0,
-   "opacity": 1,
+   "opacity": 0.3,
    "animIn": "fade",
    "animOut": "fade",
    "animDur": 0.8,
    "kind": "halo",
-   "color": "#6EC6FF",
-   "color2": "#34D399"
+   "color": "#6EC6FF"
   },
   {
    "id": "l06",
@@ -164,9 +163,8 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "tag": "RECREACIÓN",
-   "note": "Basada en el relato de un cliente · Mensajes resumidos",
-   "noteUntil": 2.75,
+   "tag": "",
+   "note": "",
    "size": 62,
    "alphaKf": [
     [
@@ -289,7 +287,6 @@
      "y": -60,
      "maxW": 640,
      "tag": "Solicitud",
-     "tagColor": "#6EC6FF",
      "from": "me",
      "dim": [
       [
@@ -329,7 +326,6 @@
      "y": 330,
      "maxW": 640,
      "tag": "Seguimiento",
-     "tagColor": "#FF6BA7",
      "dim": [
       [
        9.5,
@@ -375,7 +371,6 @@
      "y": 960,
      "maxW": 560,
      "tag": "Más adelante",
-     "tagColor": "#FFD357",
      "type": 0.95,
      "hl": "4 meses",
      "hlAt": 15.35,
@@ -413,29 +408,10 @@
    "color": "#0B0B0B",
    "align": "center",
    "lh": 1.05,
-   "accent": "#FF6BA7"
+   "accent": "#0B0B0B"
   },
   {
    "id": "l10",
-   "type": "shape",
-   "name": "Halo 2",
-   "start": 4.1,
-   "end": 7.5,
-   "x": 880,
-   "y": 1500,
-   "w": 1100,
-   "h": 1100,
-   "rot": 0,
-   "opacity": 1,
-   "animIn": "fade",
-   "animOut": "fade",
-   "animDur": 0.8,
-   "kind": "halo",
-   "color": "#FF6BA7",
-   "color2": "#6EC6FF"
-  },
-  {
-   "id": "l11",
    "type": "shape",
    "name": "Etiqueta panel",
    "start": 4.35,
@@ -456,7 +432,7 @@
    "labelSize": 34
   },
   {
-   "id": "l12",
+   "id": "l11",
    "type": "mockup",
    "name": "Panel · como me lo entregaron",
    "start": 4.15,
@@ -534,7 +510,7 @@
    ]
   },
   {
-   "id": "l13",
+   "id": "l12",
    "type": "shape",
    "name": "Dependía del desarrollador",
    "start": 7.9,
@@ -555,7 +531,7 @@
    "labelSize": 36
   },
   {
-   "id": "l14",
+   "id": "l13",
    "type": "shape",
    "name": "Corte a negro",
    "start": 19.64,
@@ -573,7 +549,7 @@
    "color": "#0B0B0B"
   },
   {
-   "id": "l15",
+   "id": "l14",
    "type": "logo",
    "name": "Logo HR (sobre negro)",
    "start": 19.64,
@@ -590,7 +566,7 @@
    "variant": "light"
   },
   {
-   "id": "l16",
+   "id": "l15",
    "type": "shape",
    "name": "Flecha (sobre negro)",
    "start": 19.64,
@@ -608,7 +584,7 @@
    "color": "#F5F1E8"
   },
   {
-   "id": "l17",
+   "id": "l16",
    "type": "text",
    "name": "Monto",
    "start": 19.92,
@@ -640,7 +616,7 @@
    ]
   },
   {
-   "id": "l18",
+   "id": "l17",
    "type": "shape",
    "name": "Atribución monto",
    "start": 20.45,
@@ -661,7 +637,7 @@
    "labelSize": 34
   },
   {
-   "id": "l19",
+   "id": "l18",
    "type": "text",
    "name": "Aclaración monto",
    "start": 20.75,
@@ -683,7 +659,7 @@
    "align": "center"
   },
   {
-   "id": "l20",
+   "id": "l19",
    "type": "shape",
    "name": "Foto junto al monto",
    "start": 21.74,
@@ -714,7 +690,7 @@
    ]
   },
   {
-   "id": "l21",
+   "id": "l20",
    "type": "shape",
    "name": "Halo 7",
    "start": 23.0,
@@ -724,16 +700,15 @@
    "w": 1100,
    "h": 1100,
    "rot": 0,
-   "opacity": 1,
+   "opacity": 0.3,
    "animIn": "fade",
    "animOut": "fade",
    "animDur": 0.8,
    "kind": "halo",
-   "color": "#6EC6FF",
-   "color2": "#34D399"
+   "color": "#6EC6FF"
   },
   {
-   "id": "l22",
+   "id": "l21",
    "type": "mockup",
    "name": "Navegador · editar sin depender",
    "start": 22.95,
@@ -789,7 +764,7 @@
    ]
   },
   {
-   "id": "l23",
+   "id": "l22",
    "type": "text",
    "name": "Título · Poder hacer cambios",
    "start": 23.5,
@@ -809,10 +784,10 @@
    "color": "#0B0B0B",
    "align": "center",
    "lh": 1.05,
-   "accent": "#FF6BA7"
+   "accent": "#0B0B0B"
   },
   {
-   "id": "l24",
+   "id": "l23",
    "type": "text",
    "name": "Título · Sin depender",
    "start": 25.55,
@@ -832,10 +807,10 @@
    "color": "#0B0B0B",
    "align": "center",
    "lh": 1.05,
-   "accent": "#FF6BA7"
+   "accent": "#0B0B0B"
   },
   {
-   "id": "l25",
+   "id": "l24",
    "type": "shape",
    "name": "Halo 8",
    "start": 27.7,
@@ -845,16 +820,15 @@
    "w": 1100,
    "h": 1100,
    "rot": 0,
-   "opacity": 1,
+   "opacity": 0.3,
    "animIn": "fade",
    "animOut": "fade",
    "animDur": 0.8,
    "kind": "halo",
-   "color": "#34D399",
-   "color2": "#6EC6FF"
+   "color": "#6EC6FF"
   },
   {
-   "id": "l26",
+   "id": "l25",
    "type": "shape",
    "name": "Ficha Dominio",
    "start": 28.25,
@@ -874,7 +848,7 @@
    "shadow": true
   },
   {
-   "id": "l27",
+   "id": "l26",
    "type": "text",
    "name": "Ficha Dominio · título",
    "start": 28.35,
@@ -895,7 +869,7 @@
    "align": "left"
   },
   {
-   "id": "l28",
+   "id": "l27",
    "type": "text",
    "name": "Ficha Dominio · detalle",
    "start": 28.4,
@@ -917,7 +891,7 @@
    "align": "left"
   },
   {
-   "id": "l29",
+   "id": "l28",
    "type": "shape",
    "name": "Ficha Dominio · a tu nombre",
    "start": 30.25,
@@ -940,7 +914,7 @@
    "shadow": true
   },
   {
-   "id": "l30",
+   "id": "l29",
    "type": "shape",
    "name": "Ficha Hosting",
    "start": 29.0,
@@ -960,7 +934,7 @@
    "shadow": true
   },
   {
-   "id": "l31",
+   "id": "l30",
    "type": "text",
    "name": "Ficha Hosting · título",
    "start": 29.1,
@@ -981,7 +955,7 @@
    "align": "left"
   },
   {
-   "id": "l32",
+   "id": "l31",
    "type": "text",
    "name": "Ficha Hosting · detalle",
    "start": 29.15,
@@ -1003,7 +977,7 @@
    "align": "left"
   },
   {
-   "id": "l33",
+   "id": "l32",
    "type": "shape",
    "name": "Ficha Hosting · a tu nombre",
    "start": 30.5,
@@ -1026,26 +1000,25 @@
    "shadow": true
   },
   {
-   "id": "l34",
+   "id": "l33",
    "type": "shape",
    "name": "Halo 9",
    "start": 31.3,
-   "end": 37.1,
+   "end": 37.0,
    "x": 880,
    "y": 1500,
    "w": 1100,
    "h": 1100,
    "rot": 0,
-   "opacity": 1,
+   "opacity": 0.3,
    "animIn": "fade",
    "animOut": "fade",
    "animDur": 0.8,
    "kind": "halo",
-   "color": "#FF6BA7",
-   "color2": "#6EC6FF"
+   "color": "#6EC6FF"
   },
   {
-   "id": "l35",
+   "id": "l34",
    "type": "shape",
    "name": "Etiqueta ejemplo",
    "start": 31.5,
@@ -1066,7 +1039,7 @@
    "labelSize": 32
   },
   {
-   "id": "l36",
+   "id": "l35",
    "type": "text",
    "name": "Título · Tú administras",
    "start": 31.45,
@@ -1089,7 +1062,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l37",
+   "id": "l36",
    "type": "text",
    "name": "Título · Te enseño a editarla",
    "start": 32.7,
@@ -1112,7 +1085,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l38",
+   "id": "l37",
    "type": "mockup",
    "name": "Navegador · editando",
    "start": 31.3,
@@ -1209,7 +1182,7 @@
    ]
   },
   {
-   "id": "l39",
+   "id": "l38",
    "type": "text",
    "name": "Título · Prefieres delegar",
    "start": 34.35,
@@ -1232,7 +1205,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l40",
+   "id": "l39",
    "type": "text",
    "name": "Título · Planes de mantención",
    "start": 35.55,
@@ -1255,7 +1228,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l41",
+   "id": "l40",
    "type": "shape",
    "name": "Píldora acompañamiento",
    "start": 35.0,
@@ -1270,14 +1243,14 @@
    "animOut": "fade",
    "animDur": 0.35,
    "kind": "pill",
-   "color": "#FFD357",
+   "color": "#0B0B0B",
    "label": "Te acompaño",
-   "labelColor": "#0B0B0B",
-   "labelSize": 48,
+   "labelColor": "#F5F1E8",
+   "labelSize": 46,
    "hitAt": 35.55
   },
   {
-   "id": "l42",
+   "id": "l41",
    "type": "shape",
    "name": "Halo cierre",
    "start": 37.0,
@@ -1287,16 +1260,15 @@
    "w": 1100,
    "h": 1100,
    "rot": 0,
-   "opacity": 1,
+   "opacity": 0.3,
    "animIn": "fade",
    "animOut": "fade",
    "animDur": 0.8,
    "kind": "halo",
-   "color": "#FF6BA7",
-   "color2": "#6EC6FF"
+   "color": "#FF6BA7"
   },
   {
-   "id": "l43",
+   "id": "l42",
    "type": "text",
    "name": "Título · Creamos la tuya",
    "start": 37.0,
@@ -1319,7 +1291,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l44",
+   "id": "l43",
    "type": "text",
    "name": "Firma",
    "start": 37.15,
@@ -1341,7 +1313,7 @@
    "align": "center"
   },
   {
-   "id": "l45",
+   "id": "l44",
    "type": "shape",
    "name": "Botón WhatsApp",
    "start": 37.2,
@@ -1366,7 +1338,7 @@
    "shadow": true
   },
   {
-   "id": "l46",
+   "id": "l45",
    "type": "caption",
    "name": "Subtítulos 1",
    "start": 0.0,
@@ -1384,10 +1356,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l47",
+   "id": "l46",
    "type": "caption",
    "name": "Subtítulos 2",
    "start": 2.93,
@@ -1405,10 +1377,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l48",
+   "id": "l47",
    "type": "caption",
    "name": "Subtítulos 3",
    "start": 4.15,
@@ -1426,10 +1398,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l49",
+   "id": "l48",
    "type": "caption",
    "name": "Subtítulos 4",
    "start": 5.54,
@@ -1447,10 +1419,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l50",
+   "id": "l49",
    "type": "caption",
    "name": "Subtítulos 5",
    "start": 7.41,
@@ -1468,10 +1440,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l51",
+   "id": "l50",
    "type": "caption",
    "name": "Subtítulos 6",
    "start": 9.49,
@@ -1489,10 +1461,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l52",
+   "id": "l51",
    "type": "caption",
    "name": "Subtítulos 7",
    "start": 11.01,
@@ -1510,10 +1482,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l53",
+   "id": "l52",
    "type": "caption",
    "name": "Subtítulos 8",
    "start": 12.84,
@@ -1531,10 +1503,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l54",
+   "id": "l53",
    "type": "caption",
    "name": "Subtítulos 9",
    "start": 14.13,
@@ -1552,10 +1524,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l55",
+   "id": "l54",
    "type": "caption",
    "name": "Subtítulos 10",
    "start": 16.39,
@@ -1573,10 +1545,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l56",
+   "id": "l55",
    "type": "caption",
    "name": "Subtítulos 11",
    "start": 19.69,
@@ -1594,10 +1566,10 @@
    "size": 54,
    "capStyle": "plain-light",
    "maxWords": 9,
-   "accent": "#FFD357"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l57",
+   "id": "l56",
    "type": "caption",
    "name": "Subtítulos 12",
    "start": 21.74,
@@ -1615,10 +1587,10 @@
    "size": 54,
    "capStyle": "plain-light",
    "maxWords": 9,
-   "accent": "#FFD357"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l58",
+   "id": "l57",
    "type": "caption",
    "name": "Subtítulos 13",
    "start": 23.45,
@@ -1636,10 +1608,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l59",
+   "id": "l58",
    "type": "caption",
    "name": "Subtítulos 14",
    "start": 25.28,
@@ -1657,10 +1629,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l60",
+   "id": "l59",
    "type": "caption",
    "name": "Subtítulos 15",
    "start": 27.77,
@@ -1678,10 +1650,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l61",
+   "id": "l60",
    "type": "caption",
    "name": "Subtítulos 16",
    "start": 29.55,
@@ -1699,10 +1671,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l62",
+   "id": "l61",
    "type": "caption",
    "name": "Subtítulos 17",
    "start": 31.39,
@@ -1720,10 +1692,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l63",
+   "id": "l62",
    "type": "caption",
    "name": "Subtítulos 18",
    "start": 32.64,
@@ -1741,10 +1713,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l64",
+   "id": "l63",
    "type": "caption",
    "name": "Subtítulos 19",
    "start": 34.29,
@@ -1762,10 +1734,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l65",
+   "id": "l64",
    "type": "caption",
    "name": "Subtítulos 20",
    "start": 35.51,
@@ -1783,10 +1755,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l66",
+   "id": "l65",
    "type": "caption",
    "name": "Subtítulos 21",
    "start": 37.1,
@@ -1804,10 +1776,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l67",
+   "id": "l66",
    "type": "caption",
    "name": "Subtítulos 22",
    "start": 38.25,
@@ -1825,10 +1797,10 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
-   "accent": "#FF6BA7"
+   "accent": "#FFFFFF"
   },
   {
-   "id": "l68",
+   "id": "l67",
    "type": "sound",
    "name": "Pop foto",
    "start": 0.05,
@@ -1846,7 +1818,7 @@
    "volume": 0.14
   },
   {
-   "id": "l69",
+   "id": "l68",
    "type": "sound",
    "name": "Tecleo 1",
    "start": 0.85,
@@ -1864,7 +1836,7 @@
    "volume": 0.1
   },
   {
-   "id": "l70",
+   "id": "l69",
    "type": "sound",
    "name": "Tecleo 2",
    "start": 9.8,
@@ -1882,7 +1854,7 @@
    "volume": 0.1
   },
   {
-   "id": "l71",
+   "id": "l70",
    "type": "sound",
    "name": "Tecleo 3",
    "start": 13.9,
@@ -1900,7 +1872,7 @@
    "volume": 0.1
   },
   {
-   "id": "l72",
+   "id": "l71",
    "type": "sound",
    "name": "Tecleo 4",
    "start": 16.8,
@@ -1918,7 +1890,7 @@
    "volume": 0.1
   },
   {
-   "id": "l73",
+   "id": "l72",
    "type": "sound",
    "name": "Whoosh atribución",
    "start": 2.92,
@@ -1936,7 +1908,7 @@
    "volume": 0.1
   },
   {
-   "id": "l74",
+   "id": "l73",
    "type": "sound",
    "name": "Pop panel",
    "start": 4.2,
@@ -1954,7 +1926,7 @@
    "volume": 0.12
   },
   {
-   "id": "l75",
+   "id": "l74",
    "type": "sound",
    "name": "Clic panel",
    "start": 6.35,
@@ -1972,7 +1944,7 @@
    "volume": 0.25
   },
   {
-   "id": "l76",
+   "id": "l75",
    "type": "sound",
    "name": "Whoosh vuelve chat",
    "start": 7.45,
@@ -1990,7 +1962,7 @@
    "volume": 0.12
   },
   {
-   "id": "l77",
+   "id": "l76",
    "type": "sound",
    "name": "Pop seguimiento",
    "start": 9.5,
@@ -2008,7 +1980,7 @@
    "volume": 0.12
   },
   {
-   "id": "l78",
+   "id": "l77",
    "type": "sound",
    "name": "Pop respuesta",
    "start": 13.6,
@@ -2026,7 +1998,7 @@
    "volume": 0.14
   },
   {
-   "id": "l79",
+   "id": "l78",
    "type": "sound",
    "name": "Golpe 4 meses",
    "start": 15.4,
@@ -2044,7 +2016,7 @@
    "volume": 0.16
   },
   {
-   "id": "l80",
+   "id": "l79",
    "type": "sound",
    "name": "Golpe millón",
    "start": 19.9,
@@ -2062,7 +2034,7 @@
    "volume": 0.22
   },
   {
-   "id": "l81",
+   "id": "l80",
    "type": "sound",
    "name": "Whoosh vuelve marfil",
    "start": 22.95,
@@ -2080,7 +2052,7 @@
    "volume": 0.1
   },
   {
-   "id": "l82",
+   "id": "l81",
    "type": "sound",
    "name": "Whoosh cambios",
    "start": 25.5,
@@ -2098,7 +2070,7 @@
    "volume": 0.08
   },
   {
-   "id": "l83",
+   "id": "l82",
    "type": "sound",
    "name": "Pop dominio",
    "start": 28.25,
@@ -2116,7 +2088,7 @@
    "volume": 0.12
   },
   {
-   "id": "l84",
+   "id": "l83",
    "type": "sound",
    "name": "Pop hosting",
    "start": 29.0,
@@ -2134,7 +2106,7 @@
    "volume": 0.12
   },
   {
-   "id": "l85",
+   "id": "l84",
    "type": "sound",
    "name": "Tick a tu nombre 1",
    "start": 30.25,
@@ -2152,7 +2124,7 @@
    "volume": 0.16
   },
   {
-   "id": "l86",
+   "id": "l85",
    "type": "sound",
    "name": "Tick a tu nombre 2",
    "start": 30.5,
@@ -2170,7 +2142,7 @@
    "volume": 0.16
   },
   {
-   "id": "l87",
+   "id": "l86",
    "type": "sound",
    "name": "Whoosh edición",
    "start": 31.3,
@@ -2188,7 +2160,7 @@
    "volume": 0.1
   },
   {
-   "id": "l88",
+   "id": "l87",
    "type": "sound",
    "name": "Clic cambiar imagen",
    "start": 32.95,
@@ -2206,7 +2178,7 @@
    "volume": 0.25
   },
   {
-   "id": "l89",
+   "id": "l88",
    "type": "sound",
    "name": "Confirmación",
    "start": 33.45,
@@ -2224,7 +2196,7 @@
    "volume": 0.12
   },
   {
-   "id": "l90",
+   "id": "l89",
    "type": "sound",
    "name": "Se aleja el navegador",
    "start": 34.45,
@@ -2242,7 +2214,7 @@
    "volume": 0.12
   },
   {
-   "id": "l91",
+   "id": "l90",
    "type": "sound",
    "name": "Pop acompañamiento",
    "start": 35.0,
@@ -2260,7 +2232,7 @@
    "volume": 0.12
   },
   {
-   "id": "l92",
+   "id": "l91",
    "type": "sound",
    "name": "Pop botón",
    "start": 37.2,
@@ -2278,7 +2250,7 @@
    "volume": 0.12
   },
   {
-   "id": "l93",
+   "id": "l92",
    "type": "sound",
    "name": "Campanita botón",
    "start": 38.3,
@@ -2296,7 +2268,7 @@
    "volume": 0.14
   },
   {
-   "id": "l94",
+   "id": "l93",
    "type": "sound",
    "name": "Música A",
    "start": 0,
@@ -2316,7 +2288,7 @@
    "fadeOut": 2.2
   },
   {
-   "id": "l95",
+   "id": "l94",
    "type": "sound",
    "name": "Música B (regresa tras el silencio)",
    "start": 22.3,

@@ -418,14 +418,15 @@ function drawWire(ctx, x, y, w, h, l, t) {
 
 // ---------- foto de ejemplo ilustrada (no es una foto real de nadie) ----------
 function samplePhoto(ctx, x, y, w, h, v = 0) {
+  // foto de ejemplo en grises: la versión 1 es la "nueva" (más oscura) para que el cambio se note
   ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-  const sky = v ? ['#FFC9A8', '#9FD8FF'] : ['#BFE8FF', '#FFF1C7'];
-  const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]); ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
-  ctx.fillStyle = v ? BRAND.sun : BRAND.coral; ctx.beginPath(); ctx.arc(x + w * (v ? 0.74 : 0.27), y + h * 0.3, h * 0.14, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,.85)'; roundRect(ctx, x + w * (v ? 0.18 : 0.6), y + h * 0.2, w * 0.2, h * 0.07, h * 0.035); ctx.fill();
+  const g = ctx.createLinearGradient(0, y, 0, y + h);
+  if (v) { g.addColorStop(0, '#4A4A50'); g.addColorStop(1, '#2A2A2E'); } else { g.addColorStop(0, '#E4E3E0'); g.addColorStop(1, '#F5F1E8'); }
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = v ? '#F5F1E8' : '#FFFFFF'; ctx.beginPath(); ctx.arc(x + w * (v ? 0.72 : 0.27), y + h * 0.3, h * 0.13, 0, Math.PI * 2); ctx.fill();
   const hill = (c, y1, y2, y3) => { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + h * y1); ctx.quadraticCurveTo(x + w * 0.32, y + h * (y1 - 0.3), x + w * 0.62, y + h * y2); ctx.quadraticCurveTo(x + w * 0.84, y + h * (y2 + 0.12), x + w, y + h * y3); ctx.lineTo(x + w, y + h); ctx.closePath(); ctx.fill(); };
-  hill(v ? '#6EC6FF' : '#7ADDB5', 0.72, 0.68, 0.6);
-  hill(v ? '#34D399' : '#34D399', 0.9, 0.82, 0.84);
+  hill(v ? '#8A8A90' : '#BDBCB8', 0.72, 0.68, 0.6);
+  hill(v ? '#C9C8C4' : '#8E8D89', 0.9, 0.82, 0.84);
   ctx.restore();
 }
 function photoVariant(l, t) { return l.swapAt != null && t >= l.swapAt ? 1 : (l.variant || 0); }
@@ -528,7 +529,7 @@ function drawEditorWire(ctx, x, y, w, h, l, t) {
   }
   // tarjetas
   const cy = hy + hh + 30, cw = (w - 64 - 48) / 3, ch = Math.max(40, y + h - cy - 24);
-  for (let i = 0; i < 3; i++) { const pc = st(1.0 + i * 0.12); ctx.save(); ctx.globalAlpha *= pc; ctx.translate(0, (1 - eo(pc)) * 22); ctx.fillStyle = ['#E6F4FF', '#FFE0EE', '#D2F5E7'][i]; roundRect(ctx, x + 32 + i * (cw + 24), cy, cw, ch, 18); ctx.fill(); ctx.restore(); }
+  for (let i = 0; i < 3; i++) { const pc = st(1.0 + i * 0.12); ctx.save(); ctx.globalAlpha *= pc; ctx.translate(0, (1 - eo(pc)) * 22); ctx.fillStyle = '#EEF1F5'; roundRect(ctx, x + 32 + i * (cw + 24), cy, cw, ch, 18); ctx.fill(); ctx.restore(); }
   // confirmación
   if (l.swapAt != null && t >= l.swapAt + 0.3 && t < l.swapAt + 2.4) {
     const q = eo(clamp((t - l.swapAt - 0.3) / 0.25, 0, 1)) * clamp((l.swapAt + 2.4 - t) / 0.3, 0, 1);
@@ -661,17 +662,17 @@ function drawChat(ctx, l, t) {
   const msgs = l.msgs || [];
   // insignia fija (no se mueve con la cámara) y nota inicial
   ctx.save(); ctx.globalAlpha *= clamp((alpha - 0.15) / 0.5, 0, 1);
-  const badge = (l.tag ?? 'RECREACIÓN');
+  const badge = (l.tag ?? 'RECREACIÓN'), by = -h / 2 + 34;
   if (badge) {
     ctx.font = `700 40px ${FONTS.body}`; ctx.letterSpacing = '5px';
-    const bw = ctx.measureText(badge).width + 64, by = -h / 2 + 34;
-    ctx.fillStyle = BRAND.coral; roundRect(ctx, -bw / 2, by - 36, bw, 72, 36); ctx.fill();
+    const bw = ctx.measureText(badge).width + 64;
+    ctx.fillStyle = BRAND.ivory; roundRect(ctx, -bw / 2, by - 36, bw, 72, 36); ctx.fill(); ctx.strokeStyle = BRAND.black; ctx.lineWidth = 3; ctx.stroke();
     ctx.fillStyle = BRAND.black; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(badge, 2, by + 2); ctx.letterSpacing = '0px';
-    const nt = l.noteUntil ?? 4;
-    if (l.note && t < nt) {
-      const q = clamp((nt - t) / 0.4, 0, 1) * clamp(t / 0.4, 0, 1);
-      ctx.globalAlpha *= q; ctx.font = `700 31px ${FONTS.body}`; ctx.fillStyle = 'rgba(11,11,11,.72)'; ctx.fillText(l.note, 0, by + 66);
-    }
+  }
+  const nt = l.noteUntil ?? 4;
+  if (l.note && t < nt) {
+    const q = clamp((nt - t) / 0.4, 0, 1) * clamp(t / 0.4, 0, 1);
+    ctx.globalAlpha *= q; ctx.font = `700 31px ${FONTS.body}`; ctx.fillStyle = 'rgba(11,11,11,.72)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(l.note, 0, by + (badge ? 66 : 0));
   }
   ctx.restore();
   // cámara
@@ -701,9 +702,9 @@ function drawChat(ctx, l, t) {
       // línea punteada que avanza
       ctx.save(); ctx.globalAlpha *= a * (others < 1 ? others : 1);
       const ly = y0 + bh + 56, x1 = -w / 2 + 30, x2 = w / 2 - 30, xe = x1 + (x2 - x1) * eo(prog);
-      ctx.strokeStyle = BRAND.coral; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.setLineDash([2, 22]);
+      ctx.strokeStyle = 'rgba(11,11,11,.55)'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.setLineDash([2, 22]);
       ctx.beginPath(); ctx.moveTo(x1, ly); ctx.lineTo(xe, ly); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = BRAND.coral; ctx.beginPath(); ctx.arc(xe, ly, 13 + 3 * Math.sin(t * 7), 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = BRAND.black; ctx.beginPath(); ctx.arc(xe, ly, 13 + 3 * Math.sin(t * 7), 0, Math.PI * 2); ctx.fill();
       ctx.restore();
       return;
     }
@@ -720,7 +721,7 @@ function drawChat(ctx, l, t) {
     if (m.tag) {
       ctx.font = `700 30px ${FONTS.body}`; ctx.letterSpacing = '3px';
       const tl = m.tag.toUpperCase(), tpw = ctx.measureText(tl).width + 44;
-      ctx.fillStyle = m.tagColor || (me ? BRAND.sky : BRAND.sun); roundRect(ctx, me ? edge - tpw : edge, yy, tpw, 50, 25); ctx.fill();
+      ctx.fillStyle = BRAND.ivory; roundRect(ctx, me ? edge - tpw : edge, yy, tpw, 50, 25); ctx.fill(); ctx.strokeStyle = BRAND.black; ctx.lineWidth = 2.5; ctx.stroke();
       ctx.fillStyle = BRAND.black; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(tl, (me ? edge - tpw : edge) + 24, yy + 26); ctx.letterSpacing = '0px';
       yy += 64;
     }
@@ -742,7 +743,7 @@ function drawChat(ctx, l, t) {
       const hi = m.hl ? ln.indexOf(m.hl) : -1;
       if (hi >= 0 && hlq > 0) {
         const hx = bx + pad + ctx.measureText(ln.slice(0, hi)).width, hw = ctx.measureText(m.hl).width;
-        ctx.fillStyle = BRAND.sun; roundRect(ctx, hx - 12, ty - lh * 0.46, (hw + 24) * hlq, lh * 0.92, 16); ctx.fill();
+        ctx.fillStyle = BRAND.ivory; roundRect(ctx, hx - 12, ty - lh * 0.46, (hw + 24) * hlq, lh * 0.92, 16); ctx.fill();
         ctx.fillStyle = fg; ctx.globalAlpha *= 0.45; ctx.fillText(ln.slice(0, hi), bx + pad, ty); ctx.fillText(ln.slice(hi + m.hl.length), hx + hw, ty); ctx.globalAlpha /= 0.45;
         ctx.fillStyle = BRAND.black; ctx.fillText(m.hl, hx, ty);
       } else { ctx.fillStyle = fg; ctx.globalAlpha *= (isFocus ? 0.45 : 1) ; ctx.fillText(shown, bx + pad, ty); ctx.globalAlpha /= (isFocus ? 0.45 : 1); }
