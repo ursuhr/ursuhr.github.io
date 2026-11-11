@@ -475,21 +475,26 @@ function drawCaption(ctx, l, t) {
   let idx = 0;
   chunks.forEach((c, i) => { if (t >= c[0].t0) idx = i; });
   const chunk = chunks[idx];
+  // Tamaño y ancho de la cápsula estables: se miden todas las frases de la capa y se usa la más ancha.
   let size = l.size || 54;
   ctx.font = `700 ${size}px ${FONTS.body}`;
-  const text = chunk.map((c) => c.w).join(' ');
-  const full = ctx.measureText(text).width;
+  const joinedW = (c) => ctx.measureText(c.map((x) => x.w).join(' ')).width;
+  const widest = Math.max(...chunks.map(joinedW));
   const maxW = l.w - 80;
-  if (full > maxW) { size = size * (maxW / full); ctx.font = `700 ${size}px ${FONTS.body}`; }
+  if (widest > maxW) { size = size * (maxW / widest); ctx.font = `700 ${size}px ${FONTS.body}`; }
   const space = ctx.measureText(' ').width;
   const widths = chunk.map((c) => ctx.measureText(c.w).width);
   const totalW = widths.reduce((a, b) => a + b, 0) + space * (chunk.length - 1);
   const style = l.capStyle || 'pill';
   const fg = style === 'plain-dark' ? BRAND.black : BRAND.ivory;
   if (style === 'pill') {
+    // la cápsula aparece junto con la primera palabra de cada frase, no antes (así nunca se ve vacía)
+    const fadeIn = clamp((t - chunk[0].t0) / 0.14, 0, 1);
+    ctx.save(); ctx.globalAlpha *= fadeIn;
     ctx.fillStyle = rgba(BRAND.black, 0.92);
-    const ph = size * 1.9, pw = totalW + size * 1.6;
+    const ph = size * 1.9, pw = Math.max(...chunks.map(joinedW)) + size * 1.6;
     roundRect(ctx, -pw / 2, -ph / 2, pw, ph, ph / 2); ctx.fill();
+    ctx.restore();
   }
   ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
   let lastShown = -1;
