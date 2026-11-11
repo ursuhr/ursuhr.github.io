@@ -44,6 +44,10 @@ function anim(l, t) {
       case 'blur': s.a *= p; s.blur = Math.max(s.blur, (1 - e) * 30); break;
       case 'slide': s.a *= clamp(p * 2, 0, 1); s.dx += dir > 0 ? (1 - e) * 260 : -(1 - e) * 260; break;
       case 'draw': s.draw = Math.min(s.draw, e); s.a *= clamp(p * 3, 0, 1); break;
+      case 'drop': {
+        const bo = (x) => { const n1 = 7.5625, d1 = 2.75; if (x < 1 / d1) return n1 * x * x; if (x < 2 / d1) { x -= 1.5 / d1; return n1 * x * x + 0.75; } if (x < 2.5 / d1) { x -= 2.25 / d1; return n1 * x * x + 0.9375; } x -= 2.625 / d1; return n1 * x * x + 0.984375; };
+        s.dy += dir > 0 ? -520 * (1 - bo(p)) : -(1 - e) * 60; s.a *= clamp(p * 4, 0, 1); break;
+      }
       default: break;
     }
   };
@@ -116,7 +120,7 @@ function drawText(ctx, l, t = 0) {
         // cada letra entra con un pequeño desfase, subiendo y asentándose
         for (let k = 0; k < wd.text.length; k++) {
           const ch = wd.text[k]; const cw = ctx.measureText(ch).width; const cx0 = x + ctx.measureText(wd.text.slice(0, k)).width;
-          const q = clamp((t - l.start - ci * 0.05) / 0.3, 0, 1); ci++;
+          const q = clamp((t - l.start - ci * (l.stagger || 0.05)) / 0.3, 0, 1); ci++;
           if (q <= 0) continue;
           ctx.save(); ctx.globalAlpha *= q; ctx.translate(cx0 + cw / 2, y + (1 - eo(q)) * 70); const sc = 0.6 + 0.4 * eb(q); ctx.scale(sc, sc);
           ctx.fillText(ch, -cw / 2, 0); ctx.restore();
@@ -217,6 +221,21 @@ function drawShape(ctx, l, t, st) {
       ctx.beginPath();
       pts.slice(0, upto).forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
       ctx.stroke();
+      break;
+    }
+    case 'padlock': {
+      const k = l.w, bh = k * 0.78, r = k * 0.26;
+      ctx.strokeStyle = l.color2 || BRAND.black; ctx.lineWidth = k * 0.1; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-r, -bh / 2 + 6); ctx.lineTo(-r, -bh / 2 - r * 0.5); ctx.arc(0, -bh / 2 - r * 0.5, r, Math.PI, 0); ctx.lineTo(r, -bh / 2 + 6); ctx.stroke();
+      ctx.fillStyle = color; roundRect(ctx, -k / 2, -bh / 2, k, bh, k * 0.12); ctx.fill();
+      ctx.fillStyle = l.color2 || BRAND.black; ctx.beginPath(); ctx.arc(0, -bh * 0.06, k * 0.075, 0, Math.PI * 2); ctx.fill();
+      roundRect(ctx, -k * 0.03, -bh * 0.06, k * 0.06, k * 0.2, k * 0.02); ctx.fill();
+      break;
+    }
+    case 'line': {
+      ctx.strokeStyle = color; ctx.lineWidth = l.stroke || 6; ctx.lineCap = 'round';
+      if (l.dash) ctx.setLineDash([l.dash, l.dash * 0.9]);
+      ctx.beginPath(); ctx.moveTo(-l.w / 2, 0); ctx.lineTo(-l.w / 2 + l.w * st.draw, 0); ctx.stroke(); ctx.setLineDash([]);
       break;
     }
     case 'key': {
@@ -501,17 +520,34 @@ const DRAW = {
   },
 };
 
+// Valor de una trayectoria [[segundo, v1, v2...], ...]: antes del primer punto usa `base`, luego interpola suave y se queda en el último.
+function kfValue(kf, t, base) {
+  if (!kf || !kf.length || t < kf[0][0]) return base;
+  let i = 0; while (i < kf.length - 1 && t >= kf[i + 1][0]) i++;
+  if (i === kf.length - 1) return kf[i].slice(1);
+  const a = kf[i], b = kf[i + 1]; const q = clamp((t - a[0]) / (b[0] - a[0]), 0, 1); const e = q * q * (3 - 2 * q);
+  return a.slice(1).map((v, k) => v + (b[k + 1] - v) * e);
+}
+
 export function drawLayer(ctx, l, t) {
   const st = anim(l, t);
   const fl = l.float ? Math.sin((t - l.start) * 2) * l.float : 0;
+  const [px, py] = l.move ? kfValue(l.move, t, [l.x, l.y]) : [l.x, l.y];
+  const ksc = l.scaleKf ? kfValue(l.scaleKf, t, [1])[0] : 1;
+  const rec = l.recedeAt != null && t >= l.recedeAt ? eo(clamp((t - l.recedeAt) / 0.55, 0, 1)) : 0; // se aleja al fondo
+  const shake = l.shakeAt != null && t >= l.shakeAt ? 16 * Math.sin(70 * (t - l.shakeAt)) * Math.exp(-9 * (t - l.shakeAt)) : 0;
   ctx.save();
-  ctx.translate(l.x + st.dx, l.y + st.dy + fl);
+  ctx.translate(px + st.dx + shake, py + st.dy + fl - 130 * rec);
   if (l.rot) ctx.rotate((l.rot * Math.PI) / 180);
+  if (l.swing && t >= l.swing.t0) { // péndulo que se asienta, girando desde el borde de arriba
+    const u = t - l.swing.t0; const pv = (l.h || 0) / 2;
+    ctx.translate(0, -pv); ctx.rotate(((l.swing.amp * Math.exp(-u * (l.swing.decay || 2.2)) * Math.sin((2 * Math.PI * u) / (l.swing.period || 0.9))) * Math.PI) / 180); ctx.translate(0, pv);
+  }
   const hit = l.hitAt != null && t >= l.hitAt ? 1 + 0.12 * Math.max(0, 1 - (t - l.hitAt) / 0.2) : 1;
   const drift0 = l.drift ? 1 + l.drift * clamp((t - l.start) / Math.max(0.01, l.end - l.start), 0, 1) : 1;
-  const drift = drift0 * hit;
-  if (st.sc !== 1 || drift !== 1) ctx.scale(st.sc * drift, st.sc * drift);
-  ctx.globalAlpha = clamp((l.opacity ?? 1) * st.a, 0, 1);
+  const sc = st.sc * drift0 * hit * ksc * (1 - 0.18 * rec);
+  if (sc !== 1) ctx.scale(sc, sc);
+  ctx.globalAlpha = clamp((l.opacity ?? 1) * st.a * (1 - 0.6 * rec), 0, 1);
   if (st.blur > 0.5) ctx.filter = `blur(${st.blur}px)`;
   try { (DRAW[l.type] || (() => {}))(ctx, l, t, st); } finally { ctx.restore(); }
 }
