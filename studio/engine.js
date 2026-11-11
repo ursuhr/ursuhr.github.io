@@ -662,17 +662,17 @@ function drawChat(ctx, l, t) {
   const msgs = l.msgs || [];
   // insignia fija (no se mueve con la cámara) y nota inicial
   ctx.save(); ctx.globalAlpha *= clamp((alpha - 0.15) / 0.5, 0, 1);
-  const badge = (l.tag ?? 'RECREACIÓN');
+  const badge = (l.tag ?? 'RECREACIÓN'), by = -h / 2 + 34;
   if (badge) {
     ctx.font = `700 40px ${FONTS.body}`; ctx.letterSpacing = '5px';
-    const bw = ctx.measureText(badge).width + 64, by = -h / 2 + 34;
+    const bw = ctx.measureText(badge).width + 64;
     ctx.fillStyle = BRAND.ivory; roundRect(ctx, -bw / 2, by - 36, bw, 72, 36); ctx.fill(); ctx.strokeStyle = BRAND.black; ctx.lineWidth = 3; ctx.stroke();
     ctx.fillStyle = BRAND.black; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(badge, 2, by + 2); ctx.letterSpacing = '0px';
-    const nt = l.noteUntil ?? 4;
-    if (l.note && t < nt) {
-      const q = clamp((nt - t) / 0.4, 0, 1) * clamp(t / 0.4, 0, 1);
-      ctx.globalAlpha *= q; ctx.font = `700 31px ${FONTS.body}`; ctx.fillStyle = 'rgba(11,11,11,.72)'; ctx.fillText(l.note, 0, by + 66);
-    }
+  }
+  const nt = l.noteUntil ?? 4;
+  if (l.note && t < nt) {
+    const q = clamp((nt - t) / 0.4, 0, 1) * clamp(t / 0.4, 0, 1);
+    ctx.globalAlpha *= q; ctx.font = `700 31px ${FONTS.body}`; ctx.fillStyle = 'rgba(11,11,11,.72)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(l.note, 0, by + (badge ? 66 : 0));
   }
   ctx.restore();
   // cámara
