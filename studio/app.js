@@ -118,7 +118,7 @@ async function loadTemplate(name) {
 }
 
 // ---------- capas ----------
-const TYPE_ICON = { text: 'T', shape: '◆', image: 'I', mockup: 'M', caption: 'S', logo: 'HR', sound: '♪' };
+const TYPE_ICON = { text: 'T', shape: '◆', image: 'I', mockup: 'M', caption: 'S', logo: 'HR', sound: '♪', chat: 'C' };
 const NEW_LAYER = {
   text: ['Texto', { type: 'text', text: 'Tu *título* aquí', font: 'title', size: 96, color: BRAND.black, accent: BRAND.coral, align: 'left', lh: 1.05, w: 880, h: 200, animIn: 'rise', animOut: 'fade' }],
   caption: ['Subtítulos', { type: 'caption', text: 'Escribe aquí lo que dice la voz', size: 54, y: 1440, w: 960, h: 110, capStyle: 'pill', maxWords: 4, accent: BRAND.coral, animIn: 'fade' }],
@@ -131,6 +131,7 @@ const NEW_LAYER = {
   arrow: ['Flecha', { type: 'shape', kind: 'arrow', w: 90, h: 90, color: BRAND.coral, animIn: 'draw' }],
   sparkle: ['Destello', { type: 'shape', kind: 'sparkle', w: 90, h: 90, color: BRAND.black, animIn: 'pop' }],
   squiggle: ['Línea orgánica', { type: 'shape', kind: 'squiggle', w: 600, h: 60, stroke: 14, animIn: 'draw' }],
+  chat: ['Chat (recreación)', { type: 'chat', contact: 'Diseñador web', status: 'últ. vez hoy', theme: 'dark', tag: 'Recreación', w: 760, h: 1180, animIn: 'rise', animOut: 'fade', days: [], msgs: [{ from: 'me', text: 'Hola, ¿pueden cambiar una foto?', at: 0.5, time: '10:02' }, { from: 'them', text: 'Agenda llena por 4 meses.', at: 2, time: '10:40', typing: 1 }] }],
   logo: ['Logo HR', { type: 'logo', variant: 'dark', w: 150, h: 100 }],
 };
 
@@ -347,7 +348,7 @@ $('#btnAdd').onclick = (e) => openMenu(e.currentTarget, [
   ['Mockup navegador', () => addLayer('browser')], ['Mockup celular', () => addLayer('phone')],
   ['Imagen o video', () => addLayer('image')], ['Botón (pill)', () => addLayer('pill')],
   ['Tarjeta', () => addLayer('card')], ['Halo', () => addLayer('halo')], ['Flecha', () => addLayer('arrow')],
-  ['Destello', () => addLayer('sparkle')], ['Línea orgánica', () => addLayer('squiggle')], ['Logo HR', () => addLayer('logo')],
+  ['Destello', () => addLayer('sparkle')], ['Línea orgánica', () => addLayer('squiggle')], ['Chat (recreación)', () => addLayer('chat')], ['Logo HR', () => addLayer('logo')],
 ]);
 
 // ---------- inspector ----------
@@ -375,6 +376,7 @@ const SCHEMA = {
     F('radius', 'Radio', 'number', { step: 4 }), F('shadow', 'Sombra', 'checkbox'), ...MEDIA_FIELDS],
   mockup: [F('kind', 'Dispositivo', 'select', { options: [['browser', 'Navegador'], ['phone', 'Celular']] }), F('asset', 'Medio', 'asset'),
     F('url', 'URL (navegador)', 'text'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }), ...MEDIA_FIELDS],
+  chat: [F('contact', 'Contacto', 'text'), F('status', 'Estado', 'text'), F('theme', 'Tema', 'select', { options: [['dark', 'Oscuro'], ['light', 'Claro']] }), F('tag', 'Etiqueta fija', 'text')],
   logo: [F('variant', 'Versión', 'select', { options: [['dark', 'Negro'], ['light', 'Marfil']] })],
   sound: [F('asset', 'Sonido', 'asset', { sound: true }), F('volume', 'Volumen (0 a 1,5)', 'number', { step: 0.01, def: () => 0.35 }),
     F('fadeIn', 'Entrada gradual (s)', 'number', { step: 0.1, def: () => 0 }), F('fadeOut', 'Salida gradual (s)', 'number', { step: 0.1, def: () => 0 })],

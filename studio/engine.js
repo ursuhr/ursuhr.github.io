@@ -512,12 +512,95 @@ function drawCaption(ctx, l, t) {
   });
 }
 
+// ---------- chat (recreación de una conversación) ----------
+// Props: contact, status, theme 'dark'|'light', tag ('Recreación'), days [{at, text}] (etiqueta de tiempo sobre el teléfono),
+// msgs [{from:'me'|'them', text, at, time, typing}]  (typing = segundos que se ven los puntos antes de que llegue el mensaje).
+function wrapLines(ctx, text, maxW) {
+  const words = text.split(/\s+/); const lines = []; let cur = '';
+  for (const w of words) { const test = cur ? cur + ' ' + w : w; if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = w; } else cur = test; }
+  if (cur) lines.push(cur);
+  return lines;
+}
+function drawChat(ctx, l, t) {
+  const dark = (l.theme || 'dark') === 'dark';
+  const w = l.w, h = l.h, r = Math.min(w * 0.14, 80), bez = 14;
+  const sw = w - bez * 2, sh = h - bez * 2, sx = -sw / 2, sy = -sh / 2;
+  const ink = dark ? BRAND.ivory : BRAND.black, muted = dark ? 'rgba(245,241,232,.55)' : 'rgba(11,11,11,.5)';
+  // etiqueta de tiempo (DÍA 1, DÍA 7...) sobre el teléfono
+  const days = l.days || []; let di = -1; days.forEach((d, i) => { if (t >= d.at) di = i; });
+  if (di >= 0) {
+    const d = days[di]; const q = clamp((t - d.at) / 0.3, 0, 1);
+    ctx.save(); ctx.globalAlpha *= q; ctx.fillStyle = l.dayColor || BRAND.coral; ctx.font = `400 46px ${FONTS.title}`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '4px';
+    ctx.fillText(d.text.toUpperCase(), 0, -h / 2 - 62 + (1 - eo(q)) * 22); ctx.restore();
+  }
+  // marco y pantalla
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 24;
+  ctx.fillStyle = dark ? '#2B2B30' : '#0B0B0B'; roundRect(ctx, -w / 2, -h / 2, w, h, r); ctx.fill(); ctx.restore();
+  ctx.save(); roundRect(ctx, sx, sy, sw, sh, r - bez); ctx.clip();
+  ctx.fillStyle = dark ? '#121214' : '#F5F1E8'; ctx.fillRect(sx, sy, sw, sh);
+  const hh = 124;
+  ctx.fillStyle = dark ? '#1C1C20' : '#FFFFFF'; ctx.fillRect(sx, sy, sw, hh);
+  ctx.fillStyle = dark ? '#3A3A40' : '#D9D3C4'; ctx.beginPath(); ctx.arc(sx + 62, sy + hh / 2 + 10, 30, 0, Math.PI * 2); ctx.fill();
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '0px';
+  ctx.fillStyle = ink; ctx.font = `700 32px ${FONTS.body}`; ctx.fillText(l.contact || 'Diseñador web', sx + 112, sy + hh / 2 - 2);
+  ctx.fillStyle = muted; ctx.font = `400 23px ${FONTS.body}`; ctx.fillText(l.status || 'últ. vez hoy', sx + 112, sy + hh / 2 + 30);
+  // mensajes: el más nuevo queda abajo y los anteriores suben
+  const msgs = l.msgs || [];
+  const maxBW = sw * 0.76, pad = 24, gap = 18;
+  ctx.font = `400 30px ${FONTS.body}`;
+  const items = [];
+  msgs.forEach((m) => {
+    const ty = m.typing || 0;
+    if (ty && t >= m.at - ty && t < m.at) items.push({ dots: true, from: m.from, enter: m.at - ty, bh: 72, bw: 120 });
+    if (t >= m.at) {
+      const lines = wrapLines(ctx, m.text, maxW(maxBW, pad));
+      const tw = Math.max(...lines.map((x) => ctx.measureText(x).width), 60);
+      items.push({ m, from: m.from, enter: m.at, lines, bw: Math.min(maxBW, tw + pad * 2), bh: lines.length * 40 + pad * 2 + (m.time ? 26 : 0), hadDots: !!ty });
+    }
+  });
+  function maxW(b, p) { return b - p * 2; }
+  const areaB = sy + sh - 34;
+  if (items.length) {
+    const last = items[items.length - 1];
+    const dH = last.bh + gap - (last.hadDots ? 72 + gap : 0);
+    const q = clamp((t - last.enter) / 0.3, 0, 1);
+    let y = areaB;
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i]; y -= it.bh; const isLast = i === items.length - 1;
+      const yy = y + (isLast ? 0 : dH * (1 - eo(q)));
+      const qq = clamp((t - it.enter) / 0.28, 0, 1);
+      const me = it.from === 'me'; const bx = me ? sx + sw - 40 - it.bw : sx + 40;
+      ctx.save(); ctx.globalAlpha *= qq;
+      const ax = me ? bx + it.bw : bx, ay = yy + it.bh; ctx.translate(ax, ay); const sc = 0.85 + 0.15 * eb(qq); ctx.scale(sc, sc); ctx.translate(-ax, -ay);
+      ctx.fillStyle = me ? (l.meColor || BRAND.sky) : (dark ? '#2A2A2E' : '#FFFFFF'); roundRect(ctx, bx, yy, it.bw, it.bh, 28); ctx.fill();
+      if (it.dots) { for (let k = 0; k < 3; k++) { const a = 0.35 + 0.65 * Math.max(0, Math.sin(t * 7 - k * 0.9)); ctx.fillStyle = `rgba(245,241,232,${a})`; ctx.beginPath(); ctx.arc(bx + 34 + k * 26, yy + it.bh / 2, 8, 0, Math.PI * 2); ctx.fill(); } }
+      else {
+        ctx.fillStyle = me ? BRAND.black : ink; ctx.font = `400 30px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        it.lines.forEach((ln, k) => ctx.fillText(ln, bx + pad, yy + pad + 20 + k * 40));
+        if (it.m.time) { ctx.fillStyle = me ? 'rgba(11,11,11,.5)' : muted; ctx.font = `400 20px ${FONTS.body}`; ctx.textAlign = 'right'; ctx.fillText(it.m.time, bx + it.bw - 18, yy + it.bh - 22); }
+      }
+      ctx.restore();
+      y -= gap;
+    }
+  }
+  ctx.restore();
+  // etiqueta honesta: es una escena reconstruida
+  const tag = (l.tag ?? 'Recreación').toUpperCase();
+  if (tag) {
+    ctx.save(); ctx.font = `700 22px ${FONTS.body}`; ctx.letterSpacing = '3px'; const tw = ctx.measureText(tag).width + 44;
+    ctx.fillStyle = dark ? 'rgba(245,241,232,.14)' : 'rgba(11,11,11,.1)'; roundRect(ctx, -tw / 2, h / 2 + 30, tw, 42, 21); ctx.fill();
+    ctx.fillStyle = muted; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(tag, 0, h / 2 + 52); ctx.restore();
+  }
+}
+
 // ---------- capas ----------
 const DRAW = {
   text: (ctx, l, t) => drawText(ctx, l, t),
   shape: drawShape,
   image: (ctx, l) => drawImageLayer(ctx, l),
   mockup: (ctx, l, t) => drawMockup(ctx, l, t),
+  chat: (ctx, l, t) => drawChat(ctx, l, t),
   caption: (ctx, l, t) => drawCaption(ctx, l, t),
   logo: (ctx, l) => {
     const img = logos[l.variant === 'light' ? 'light' : 'dark'];
