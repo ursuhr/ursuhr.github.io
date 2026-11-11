@@ -368,7 +368,7 @@ const SCHEMA = {
   caption: [F('text', 'Texto de la voz', 'textarea'), F('size', 'Tamaño', 'number', { step: 2 }),
     F('capStyle', 'Estilo', 'select', { options: [['pill', 'Pill negra'], ['plain-light', 'Texto claro'], ['plain-dark', 'Texto oscuro']] }),
     F('maxWords', 'Palabras por frase', 'number', { step: 1 }), F('color', 'Color texto', 'color'), F('accent', 'Palabra activa', 'color')],
-  shape: [F('kind', 'Forma', 'select', { options: [['halo', 'Halo'], ['pill', 'Pill'], ['rect', 'Tarjeta / rectángulo'], ['circle', 'Círculo'], ['arrow', 'Flecha'], ['sparkle', 'Destello'], ['squiggle', 'Línea orgánica'], ['key', 'Llave']] }),
+  shape: [F('kind', 'Forma', 'select', { options: [['halo', 'Halo'], ['pill', 'Pill'], ['rect', 'Tarjeta / rectángulo'], ['circle', 'Círculo'], ['arrow', 'Flecha'], ['sparkle', 'Destello'], ['squiggle', 'Línea orgánica'], ['key', 'Llave'], ['padlock', 'Candado'], ['line', 'Línea']] }),
     F('color', 'Color', 'color'), F('color2', 'Color 2', 'color'), F('radius', 'Radio', 'number', { step: 4 }), F('stroke', 'Grosor', 'number', { step: 1 }),
     F('label', 'Texto del botón', 'text'), F('labelColor', 'Color texto', 'color'), F('arrowIcon', 'Flecha en botón', 'checkbox'), F('shadow', 'Sombra', 'checkbox')],
   image: [F('asset', 'Medio', 'asset'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }),
@@ -803,7 +803,7 @@ function trimAudio(buf, dur) {
 async function doExport() {
   if (S.exporting) return;
   pause();
-  const missing = S.P.layers.filter((l) => !l.hidden && (l.type === 'image' || l.type === 'mockup') && !assets.has(l.asset)).length;
+  const missing = S.P.layers.filter((l) => !l.hidden && !l.wire && (l.type === 'image' || l.type === 'mockup') && !assets.has(l.asset)).length;
   if (missing && !confirm(`Hay ${missing} capa(s) sin grabación o imagen: saldrán con rayas.\n¿Exportar igual?`)) return;
   if (!window.VideoEncoder) { alert('Este navegador no puede exportar video. Usa Google Chrome actualizado.'); return; }
   const modal = $('#exportModal'); const box = modal.querySelector('.box');
