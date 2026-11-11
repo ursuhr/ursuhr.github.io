@@ -418,14 +418,15 @@ function drawWire(ctx, x, y, w, h, l, t) {
 
 // ---------- foto de ejemplo ilustrada (no es una foto real de nadie) ----------
 function samplePhoto(ctx, x, y, w, h, v = 0) {
+  // foto de ejemplo en grises: la versión 1 es la "nueva" (más oscura) para que el cambio se note
   ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
   const g = ctx.createLinearGradient(0, y, 0, y + h);
-  if (v) { g.addColorStop(0, '#F5F1E8'); g.addColorStop(1, '#E9E2D0'); } else { g.addColorStop(0, '#E4F3FD'); g.addColorStop(1, '#F5F1E8'); }
+  if (v) { g.addColorStop(0, '#4A4A50'); g.addColorStop(1, '#2A2A2E'); } else { g.addColorStop(0, '#E4E3E0'); g.addColorStop(1, '#F5F1E8'); }
   ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
-  ctx.fillStyle = v ? BRAND.coral : '#FFFFFF'; ctx.beginPath(); ctx.arc(x + w * (v ? 0.72 : 0.27), y + h * 0.3, h * 0.13, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = v ? '#F5F1E8' : '#FFFFFF'; ctx.beginPath(); ctx.arc(x + w * (v ? 0.72 : 0.27), y + h * 0.3, h * 0.13, 0, Math.PI * 2); ctx.fill();
   const hill = (c, y1, y2, y3) => { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + h * y1); ctx.quadraticCurveTo(x + w * 0.32, y + h * (y1 - 0.3), x + w * 0.62, y + h * y2); ctx.quadraticCurveTo(x + w * 0.84, y + h * (y2 + 0.12), x + w, y + h * y3); ctx.lineTo(x + w, y + h); ctx.closePath(); ctx.fill(); };
-  hill(v ? '#3A3A3F' : '#A9D8F7', 0.72, 0.68, 0.6);
-  hill(v ? '#0B0B0B' : '#6EC6FF', 0.9, 0.82, 0.84);
+  hill(v ? '#8A8A90' : '#BDBCB8', 0.72, 0.68, 0.6);
+  hill(v ? '#C9C8C4' : '#8E8D89', 0.9, 0.82, 0.84);
   ctx.restore();
 }
 function photoVariant(l, t) { return l.swapAt != null && t >= l.swapAt ? 1 : (l.variant || 0); }
