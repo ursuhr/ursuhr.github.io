@@ -635,7 +635,7 @@ async function registerMedia(blob, name) {
   if (!type && /\.(mov|mp4|m4v|webm)$/i.test(name)) type = 'video/mp4'; // algunos .mov llegan sin tipo
   if (type.startsWith('image/')) {
     const img = new Image(); img.src = url; await img.decode().catch(() => {});
-    assets.set(name, { kind: 'image', el: img, name }); return 'image';
+    assets.set(name, { kind: 'image', el: img, name, size: blob.size }); return 'image';
   }
   if (type.startsWith('video/')) {
     const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
@@ -643,10 +643,10 @@ async function registerMedia(blob, name) {
     await new Promise((res) => { const t = setTimeout(res, 12000); const ok = () => { clearTimeout(t); res(); }; v.addEventListener('loadeddata', ok, { once: true }); v.addEventListener('error', ok, { once: true }); });
     if (!v.videoWidth) { toast(`El navegador no puede leer "${name}". Si es un .mov de Mac, expórtalo desde QuickTime como 1080p o pásamelo y lo convierto.`); URL.revokeObjectURL(url); return 'fail'; }
     v.addEventListener('seeked', () => { if (!S.exporting) paint(); });
-    assets.set(name, { kind: 'video', el: v, name, duration: v.duration }); return 'video';
+    assets.set(name, { kind: 'video', el: v, name, duration: v.duration, size: blob.size }); return 'video';
   }
   if (type.startsWith('audio/')) {
-    try { const buffer = await decodeSound(await blob.arrayBuffer()); sounds.set(name, { name, label: name, buffer }); return 'sound'; } catch { toast(`No pude leer ${name}`); return 'fail'; }
+    try { const buffer = await decodeSound(await blob.arrayBuffer()); sounds.set(name, { name, label: name, buffer, size: blob.size }); return 'sound'; } catch { toast(`No pude leer ${name}`); return 'fail'; }
   }
   return null;
 }
@@ -668,16 +668,25 @@ async function restoreFiles() {
 }
 
 // ---------- medios y audio ----------
+// Si ya hay otro archivo con el mismo nombre pero distinto, se le agrega "(2)", "(3)"... para no pisarlo.
+function uniqueName(f) {
+  const ex = assets.get(f.name) || sounds.get(f.name);
+  if (!ex || ex.size === f.size) return f.name;
+  const m = f.name.match(/^(.*?)(\.[^.]*)?$/); let i = 2, nm;
+  do { nm = `${m[1]} (${i++})${m[2] || ''}`; } while (assets.has(nm) || sounds.has(nm));
+  return nm;
+}
 async function importMedia(files, target) {
   let lastName = ''; let audioAdded = ''; let failed = false;
   if ([...files].some((f) => f.size > 20e6)) toast('Cargando el video, puede tardar unos segundos…');
   for (const f of files) {
-    const kind = await registerMedia(f, f.name);
+    const nm = uniqueName(f);
+    const kind = await registerMedia(f, nm);
     if (kind === 'fail') { failed = true; continue; } // registerMedia ya explicó qué pasó
     if (!kind) continue;
-    saveFile(`m:${f.name}`, f, kind, f.name);
-    if (kind === 'sound') { audioAdded = f.name; continue; }
-    lastName = f.name;
+    saveFile(`m:${nm}`, f, kind, nm);
+    if (kind === 'sound') { audioAdded = nm; continue; }
+    lastName = nm;
   }
   if (!lastName && audioAdded) { toast(`Sonido "${audioAdded}" cargado. Agrégalo con el botón ♪ Sonido.`); refreshAll(); return; }
   if (!lastName) { if (!failed) toast('Formato no compatible'); return; }

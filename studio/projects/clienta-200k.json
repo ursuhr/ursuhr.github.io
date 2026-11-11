@@ -1,6 +1,6 @@
 {
  "template": "clienta-200k",
- "rev": 3,
+ "rev": 4,
  "name": "Reel · Los $200.000 por las claves",
  "width": 1080,
  "height": 1920,
@@ -453,6 +453,9 @@
    "asset": "",
    "wire": "new",
    "url": "tu-web-nueva.cl",
+   "fit": "cover",
+   "fy": 1,
+   "speed": 0.7,
    "buildAt": 18.1,
    "drift": 0.03
   },
@@ -511,7 +514,7 @@
    "animDur": 0.45,
    "text": "Antes de\ncontratar,\n*pregunta*",
    "font": "title",
-   "size": 76,
+   "size": 100,
    "color": "#0B0B0B",
    "accent": "#34D399",
    "align": "left",
@@ -998,7 +1001,7 @@
    "animOut": "none",
    "animDur": 0.45,
    "asset": "whoosh-1",
-   "volume": 0.08
+   "volume": 0.12
   },
   {
    "id": "l44",
