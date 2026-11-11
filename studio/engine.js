@@ -100,8 +100,9 @@ function layoutText(ctx, l) {
 
 const measureCtx = document.createElement('canvas').getContext('2d');
 
-function drawText(ctx, l) {
+function drawText(ctx, l, t = 0) {
   const { lines, lh, h, space } = layoutText(ctx, l);
+  const letters = l.animIn === 'letters'; let ci = 0;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   const align = l.align || 'left';
@@ -111,7 +112,16 @@ function drawText(ctx, l) {
     for (const wd of ln.words) {
       x += wd.sp;
       ctx.fillStyle = wd.accent ? (l.accent || BRAND.coral) : (l.color || BRAND.black);
-      ctx.fillText(wd.text, x, y);
+      if (letters) {
+        // cada letra entra con un pequeño desfase, subiendo y asentándose
+        for (let k = 0; k < wd.text.length; k++) {
+          const ch = wd.text[k]; const cw = ctx.measureText(ch).width; const cx0 = x + ctx.measureText(wd.text.slice(0, k)).width;
+          const q = clamp((t - l.start - ci * 0.05) / 0.3, 0, 1); ci++;
+          if (q <= 0) continue;
+          ctx.save(); ctx.globalAlpha *= q; ctx.translate(cx0 + cw / 2, y + (1 - eo(q)) * 70); const sc = 0.6 + 0.4 * eb(q); ctx.scale(sc, sc);
+          ctx.fillText(ch, -cw / 2, 0); ctx.restore();
+        }
+      } else ctx.fillText(wd.text, x, y);
       x += wd.w;
     }
   });
@@ -273,30 +283,76 @@ function drawImageLayer(ctx, l) {
   ctx.restore();
 }
 
-// Página ilustrada para el navegador: wire 'old' (gris) o 'new' (con tu paleta). lockAt = segundo en que aparece el aviso de permisos.
+// Página ilustrada para el navegador. Props: wire 'old' | 'new'; buildAt (la página se arma por capas desde ese segundo);
+// cursor [[segundo, x, y], ...] con x,y en fracción de la página; clicks [segundos]; menuAt (abre el menú de Ajustes); lockAt (aviso de permisos).
 function drawWire(ctx, x, y, w, h, l, t) {
   const nw = l.wire === 'new';
+  const b0 = l.buildAt;
+  const st = (a, d = 0.35) => (b0 == null ? 1 : clamp((t - b0 - a) / d, 0, 1));
+  const clicks = l.clicks || [];
   ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, w, h);
+  // cabecera: logo, dos enlaces y el botón Ajustes
+  const p0 = st(0);
+  ctx.save(); ctx.globalAlpha *= p0;
   ctx.fillStyle = nw ? BRAND.black : '#CBD2DC'; roundRect(ctx, x + 32, y + 28, 46, 46, 23); ctx.fill();
-  for (let i = 0; i < 3; i++) { ctx.fillStyle = nw ? 'rgba(11,11,11,.5)' : '#DDE2EA'; roundRect(ctx, x + w - 340 + i * 104, y + 42, 80, 18, 9); ctx.fill(); }
-  const hy = y + 110, hh = h * 0.38;
-  if (nw) {
-    const g = ctx.createLinearGradient(x + 32, hy, x + w - 32, hy + hh);
-    g.addColorStop(0, BRAND.coral); g.addColorStop(0.5, BRAND.sun); g.addColorStop(1, BRAND.green); ctx.fillStyle = g;
-  } else ctx.fillStyle = '#E9ECF1';
-  roundRect(ctx, x + 32, hy, w - 64, hh, 22); ctx.fill();
+  ctx.restore();
+  for (let i = 0; i < 2; i++) {
+    ctx.save(); ctx.globalAlpha *= st(0.15 + i * 0.12);
+    ctx.fillStyle = nw ? 'rgba(11,11,11,.5)' : '#DDE2EA'; roundRect(ctx, x + w - 440 + i * 100, y + 42, 80, 18, 9); ctx.fill(); ctx.restore();
+  }
+  const bx = x + w - 190, by = y + 28, bw = 150, bh = 46;
+  const pressed = clicks.length && clicks.some((c) => t >= c && t < c + 0.14) && (l.menuAt == null || t < l.menuAt + 0.14);
+  const active = l.menuAt != null && t >= l.menuAt;
+  ctx.save(); ctx.globalAlpha *= st(0.4);
+  ctx.translate(bx + bw / 2, by + bh / 2); if (pressed) ctx.scale(0.93, 0.93);
+  ctx.fillStyle = active ? '#FFE0EE' : '#FFFFFF'; ctx.strokeStyle = active ? BRAND.coral : '#CBD2DC'; ctx.lineWidth = 3;
+  roundRect(ctx, -bw / 2, -bh / 2, bw, bh, 23); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = BRAND.black; ctx.font = `700 22px ${FONTS.body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Ajustes', 0, 2);
+  ctx.restore();
+  // héroe: la imagen se revela con un barrido
+  const hy = y + 110, hh = h * 0.36;
+  const pw = eo(st(0.5, 0.6));
+  if (pw > 0) {
+    ctx.save(); ctx.beginPath(); ctx.rect(x + 32, hy - 4, (w - 64) * pw, hh + 8); ctx.clip();
+    if (nw) { const g = ctx.createLinearGradient(x + 32, hy, x + w - 32, hy + hh); g.addColorStop(0, BRAND.coral); g.addColorStop(0.5, BRAND.sun); g.addColorStop(1, BRAND.green); ctx.fillStyle = g; }
+    else ctx.fillStyle = '#E9ECF1';
+    roundRect(ctx, x + 32, hy, w - 64, hh, 22); ctx.fill();
+    ctx.restore();
+  }
   ctx.fillStyle = nw ? BRAND.black : '#C5CCD6';
-  roundRect(ctx, x + 72, hy + hh * 0.26, w * 0.42, 30, 15); ctx.fill();
-  roundRect(ctx, x + 72, hy + hh * 0.26 + 48, w * 0.3, 30, 15); ctx.fill();
-  if (nw) { ctx.fillStyle = BRAND.black; roundRect(ctx, x + 72, hy + hh * 0.26 + 110, 170, 52, 26); ctx.fill(); }
+  ctx.save(); ctx.globalAlpha *= st(1.0); roundRect(ctx, x + 72, hy + hh * 0.26 + (1 - eo(st(1.0))) * 14, w * 0.42, 30, 15); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.globalAlpha *= st(1.15); roundRect(ctx, x + 72, hy + hh * 0.26 + 48 + (1 - eo(st(1.15))) * 14, w * 0.3, 30, 15); ctx.fill(); ctx.restore();
+  if (nw) { ctx.save(); ctx.globalAlpha *= st(1.3); ctx.fillStyle = BRAND.black; roundRect(ctx, x + 72, hy + hh * 0.26 + 110, 170, 52, 26); ctx.fill(); ctx.restore(); }
+  // tarjetas, una tras otra
   const cy = hy + hh + 30, cw = (w - 64 - 48) / 3, ch = Math.max(40, y + h - cy - 24);
   for (let i = 0; i < 3; i++) {
+    const pc = st(1.45 + i * 0.15);
+    ctx.save(); ctx.globalAlpha *= pc; ctx.translate(0, (1 - eo(pc)) * 26);
     ctx.fillStyle = nw ? ['#FFE0EE', '#FFF1C7', '#D2F5E7'][i] : '#EEF1F5'; roundRect(ctx, x + 32 + i * (cw + 24), cy, cw, ch, 18); ctx.fill();
     ctx.fillStyle = nw ? 'rgba(11,11,11,.45)' : '#CBD2DC'; roundRect(ctx, x + 52 + i * (cw + 24), cy + 22, cw * 0.6, 16, 8); ctx.fill();
+    ctx.restore();
   }
+  // menú de Ajustes: la última opción está restringida
+  if (l.menuAt != null && t >= l.menuAt) {
+    const q = eo(clamp((t - l.menuAt) / 0.2, 0, 1));
+    const mx = x + w - 340, my = y + 90, mw = 300, rh = 56;
+    ctx.save(); ctx.globalAlpha *= q; ctx.translate(mx + mw / 2, my); ctx.scale(1, 0.85 + 0.15 * q); ctx.translate(-(mx + mw / 2), -my);
+    ctx.shadowColor = 'rgba(0,0,0,.2)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, mx, my, mw, rh * 3 + 16, 20); ctx.fill(); ctx.shadowColor = 'transparent';
+    const flash = l.lockAt != null && t >= l.lockAt - 0.1 && t < l.lockAt + 0.35;
+    ['Contenido', 'Diseño', 'Administrador'].forEach((lab, i) => {
+      const ry = my + 8 + i * rh;
+      if (i === 2 && flash) { ctx.fillStyle = '#FFE0EE'; roundRect(ctx, mx + 8, ry, mw - 16, rh, 14); ctx.fill(); }
+      ctx.fillStyle = i === 2 ? 'rgba(11,11,11,.42)' : BRAND.black; ctx.font = `700 24px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(lab, mx + 28, ry + rh / 2 + 1);
+      if (i === 2) { ctx.strokeStyle = 'rgba(11,11,11,.42)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(mx + mw - 44, ry + rh / 2 - 6, 7, Math.PI, 0); ctx.stroke(); ctx.fillStyle = 'rgba(11,11,11,.42)'; roundRect(ctx, mx + mw - 53, ry + rh / 2 - 6, 18, 14, 4); ctx.fill(); }
+    });
+    ctx.restore();
+  }
+  // aviso de permisos: el fondo baja de intensidad y la ventana "rebota" al entrar
   if (l.lockAt != null && t >= l.lockAt) {
     const p = clamp((t - l.lockAt) / 0.35, 0, 1);
-    ctx.fillStyle = `rgba(11,11,11,${0.38 * p})`; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = `rgba(11,11,11,${0.42 * p})`; ctx.fillRect(x, y, w, h);
     const mw = Math.min(w - 120, 560), mh = 300;
     ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.scale(0.7 + 0.3 * eb(p), 0.7 + 0.3 * eb(p)); ctx.globalAlpha *= clamp(p * 2, 0, 1);
     ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
@@ -309,11 +365,25 @@ function drawWire(ctx, x, y, w, h, l, t) {
     ctx.fillStyle = 'rgba(11,11,11,.55)'; ctx.font = `400 27px ${FONTS.body}`; ctx.fillText(l.lockText || 'Se necesita rol de administrador', 0, 102);
     ctx.restore();
   }
+  // cursor: sigue una trayectoria con puntos [segundo, x, y]; cada clic dibuja una onda
   if (l.cursor) {
-    const px = x + w * l.cursor[0], py = y + h * l.cursor[1];
-    ctx.fillStyle = BRAND.black; ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py + 44); ctx.lineTo(px + 12, py + 34); ctx.lineTo(px + 22, py + 56);
-    ctx.lineTo(px + 32, py + 51); ctx.lineTo(px + 22, py + 31); ctx.lineTo(px + 38, py + 31); ctx.closePath(); ctx.stroke(); ctx.fill();
+    let cx, cyy;
+    const kf = Array.isArray(l.cursor[0]) ? l.cursor : null;
+    if (!kf) { cx = l.cursor[0]; cyy = l.cursor[1]; }
+    else if (t >= kf[0][0]) {
+      let i = 0; while (i < kf.length - 1 && t >= kf[i + 1][0]) i++;
+      if (i === kf.length - 1) { cx = kf[i][1]; cyy = kf[i][2]; }
+      else { const a = kf[i], b = kf[i + 1]; const q = clamp((t - a[0]) / (b[0] - a[0]), 0, 1); const e = q * q * (3 - 2 * q); cx = a[1] + (b[1] - a[1]) * e; cyy = a[2] + (b[2] - a[2]) * e; }
+    }
+    if (cx != null) {
+      const px = x + w * cx, py = y + h * cyy;
+      for (const c of clicks) if (t >= c && t < c + 0.45) { const q = (t - c) / 0.45; ctx.strokeStyle = `rgba(255,107,167,${0.7 * (1 - q)})`; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(px, py, 10 + 56 * eo(q), 0, Math.PI * 2); ctx.stroke(); }
+      const down = clicks.some((c) => t >= c && t < c + 0.12);
+      ctx.save(); ctx.translate(px, py); if (down) ctx.scale(0.86, 0.86);
+      ctx.fillStyle = BRAND.black; ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 44); ctx.lineTo(12, 34); ctx.lineTo(22, 56); ctx.lineTo(32, 51); ctx.lineTo(22, 31); ctx.lineTo(38, 31); ctx.closePath(); ctx.stroke(); ctx.fill();
+      ctx.restore();
+    }
   }
 }
 
@@ -420,7 +490,7 @@ function drawCaption(ctx, l, t) {
 
 // ---------- capas ----------
 const DRAW = {
-  text: (ctx, l) => drawText(ctx, l),
+  text: (ctx, l, t) => drawText(ctx, l, t),
   shape: drawShape,
   image: (ctx, l) => drawImageLayer(ctx, l),
   mockup: (ctx, l, t) => drawMockup(ctx, l, t),
@@ -437,7 +507,9 @@ export function drawLayer(ctx, l, t) {
   ctx.save();
   ctx.translate(l.x + st.dx, l.y + st.dy + fl);
   if (l.rot) ctx.rotate((l.rot * Math.PI) / 180);
-  const drift = l.drift ? 1 + l.drift * clamp((t - l.start) / Math.max(0.01, l.end - l.start), 0, 1) : 1;
+  const hit = l.hitAt != null && t >= l.hitAt ? 1 + 0.12 * Math.max(0, 1 - (t - l.hitAt) / 0.2) : 1;
+  const drift0 = l.drift ? 1 + l.drift * clamp((t - l.start) / Math.max(0.01, l.end - l.start), 0, 1) : 1;
+  const drift = drift0 * hit;
   if (st.sc !== 1 || drift !== 1) ctx.scale(st.sc * drift, st.sc * drift);
   ctx.globalAlpha = clamp((l.opacity ?? 1) * st.a, 0, 1);
   if (st.blur > 0.5) ctx.filter = `blur(${st.blur}px)`;
