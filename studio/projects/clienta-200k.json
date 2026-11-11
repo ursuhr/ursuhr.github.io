@@ -511,7 +511,7 @@
    "animDur": 0.45,
    "text": "Antes de\ncontratar,\n*pregunta*",
    "font": "title",
-   "size": 100,
+   "size": 76,
    "color": "#0B0B0B",
    "accent": "#34D399",
    "align": "left",
@@ -998,7 +998,7 @@
    "animOut": "none",
    "animDur": 0.45,
    "asset": "whoosh-1",
-   "volume": 0.12
+   "volume": 0.08
   },
   {
    "id": "l44",
