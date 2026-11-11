@@ -1,6 +1,6 @@
 {
  "template": "clienta-200k",
- "rev": 4,
+ "rev": 5,
  "name": "Reel · Los $200.000 por las claves",
  "width": 1080,
  "height": 1920,
@@ -428,9 +428,11 @@
    "animOut": "fade",
    "animDur": 0.2,
    "kind": "browser",
-   "asset": "",
+   "asset": "pagina-antigua-portada.png",
+   "fit": "cover",
+   "fy": 0,
    "wire": "old",
-   "url": "sitio-de-la-clienta.cl",
+   "url": "sitio-anterior",
    "lockAt": 16.1,
    "recedeAt": 17.5
   },
