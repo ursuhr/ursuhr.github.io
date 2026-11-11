@@ -45,6 +45,26 @@
       "archivo": "musica-2.mp3",
       "uso": "música de fondo, versión 2 (40 s, instrumental)",
       "prompt": "Calm modern minimal pop instrumental for a business explainer, warm soft pads, gentle plucked synth, light steady soft kick and finger snaps, clean airy production, mid tempo around 100 bpm, optimistic and unobtrusive"
+    },
+    {
+      "archivo": "clic-1.mp3",
+      "uso": "clic de mouse",
+      "prompt": "sintetizado: dos transitorios (pulsar y soltar)"
+    },
+    {
+      "archivo": "bloqueo-1.mp3",
+      "uso": "aviso de bloqueo o permiso denegado",
+      "prompt": "sintetizado: golpe grave seco con clic metálico"
+    },
+    {
+      "archivo": "golpe-1.mp3",
+      "uso": "golpe del monto a pantalla completa",
+      "prompt": "sintetizado: bombo con barrido y chasquido"
+    },
+    {
+      "archivo": "deslizar-1.mp3",
+      "uso": "movimiento de ventana",
+      "prompt": "sintetizado: soplido suave que sube y baja"
     }
   ]
 }
