@@ -437,7 +437,7 @@ function drawMockup(ctx, l, t = 0) {
     ctx.fillText(l.url || 'ursulahr.cl', 30, -h / 2 + bar / 2 + 1);
     ctx.save();
     ctx.beginPath(); ctx.rect(-w / 2, -h / 2 + bar, w, h - bar); ctx.clip();
-    if (l.wire) drawWire(ctx, -w / 2, -h / 2 + bar, w, h - bar, l, t);
+    if (l.wire && !a) drawWire(ctx, -w / 2, -h / 2 + bar, w, h - bar, l, t); // si hay grabación asignada, manda la grabación
     else if (!drawMedia(ctx, a, -w / 2, -h / 2 + bar, w, h - bar, l.fit, l)) placeholder(ctx, -w / 2, -h / 2 + bar, w, h - bar, l.placeholder);
     ctx.restore();
     ctx.restore();
