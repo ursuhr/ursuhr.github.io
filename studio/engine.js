@@ -200,6 +200,16 @@ function drawShape(ctx, l, t, st) {
       }
       break;
     }
+    case 'photo': {
+      const pad = 16, r = l.radius ?? 28;
+      ctx.shadowColor = 'rgba(0,0,0,.2)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 16; ctx.fillStyle = '#FFFFFF'; roundRect(ctx, -l.w / 2, -l.h / 2, l.w, l.h, r); ctx.fill(); ctx.shadowColor = 'transparent';
+      ctx.save(); roundRect(ctx, -l.w / 2 + pad, -l.h / 2 + pad, l.w - pad * 2, l.h - pad * 2, r - 10); ctx.clip();
+      const v = photoVariant(l, t); samplePhoto(ctx, -l.w / 2 + pad, -l.h / 2 + pad, l.w - pad * 2, l.h - pad * 2, v);
+      if (l.swapAt != null && t >= l.swapAt && t < l.swapAt + 0.3) { ctx.fillStyle = `rgba(255,255,255,${0.7 * (1 - (t - l.swapAt) / 0.3)})`; ctx.fillRect(-l.w / 2, -l.h / 2, l.w, l.h); }
+      ctx.restore();
+      if (l.label) { ctx.font = `700 26px ${FONTS.body}`; const lw = ctx.measureText(l.label).width + 40; ctx.fillStyle = BRAND.black; roundRect(ctx, -lw / 2, l.h / 2 - 20, lw, 46, 23); ctx.fill(); ctx.fillStyle = BRAND.ivory; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(l.label, 0, l.h / 2 + 4); }
+      break;
+    }
     case 'arrow': strokeArrow(ctx, l.w, color, l.stroke || l.w * 0.09); break;
     case 'sparkle': {
       const r = (l.w / 2) * (1 + 0.06 * Math.sin(t * 3 + l.start));
@@ -406,6 +416,128 @@ function drawWire(ctx, x, y, w, h, l, t) {
   }
 }
 
+// ---------- foto de ejemplo ilustrada (no es una foto real de nadie) ----------
+function samplePhoto(ctx, x, y, w, h, v = 0) {
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  const sky = v ? ['#FFC9A8', '#9FD8FF'] : ['#BFE8FF', '#FFF1C7'];
+  const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, sky[0]); g.addColorStop(1, sky[1]); ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = v ? BRAND.sun : BRAND.coral; ctx.beginPath(); ctx.arc(x + w * (v ? 0.74 : 0.27), y + h * 0.3, h * 0.14, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.85)'; roundRect(ctx, x + w * (v ? 0.18 : 0.6), y + h * 0.2, w * 0.2, h * 0.07, h * 0.035); ctx.fill();
+  const hill = (c, y1, y2, y3) => { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + h * y1); ctx.quadraticCurveTo(x + w * 0.32, y + h * (y1 - 0.3), x + w * 0.62, y + h * y2); ctx.quadraticCurveTo(x + w * 0.84, y + h * (y2 + 0.12), x + w, y + h * y3); ctx.lineTo(x + w, y + h); ctx.closePath(); ctx.fill(); };
+  hill(v ? '#6EC6FF' : '#7ADDB5', 0.72, 0.68, 0.6);
+  hill(v ? '#34D399' : '#34D399', 0.9, 0.82, 0.84);
+  ctx.restore();
+}
+function photoVariant(l, t) { return l.swapAt != null && t >= l.swapAt ? 1 : (l.variant || 0); }
+
+function drawCursorFx(ctx, x, y, w, h, l, t) {
+  if (!l.cursor) return;
+  const kf = l.cursor; let cx, cyy;
+  if (t >= kf[0][0]) {
+    let i = 0; while (i < kf.length - 1 && t >= kf[i + 1][0]) i++;
+    if (i === kf.length - 1) { cx = kf[i][1]; cyy = kf[i][2]; }
+    else { const a = kf[i], b = kf[i + 1]; const q = clamp((t - a[0]) / (b[0] - a[0]), 0, 1); const e = q * q * (3 - 2 * q); cx = a[1] + (b[1] - a[1]) * e; cyy = a[2] + (b[2] - a[2]) * e; }
+  }
+  if (cx == null) return;
+  const clicks = l.clicks || [], px = x + w * cx, py = y + h * cyy;
+  for (const c of clicks) if (t >= c && t < c + 0.45) { const q = (t - c) / 0.45; ctx.strokeStyle = `rgba(110,198,255,${0.8 * (1 - q)})`; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(px, py, 10 + 56 * eo(q), 0, Math.PI * 2); ctx.stroke(); }
+  const down = clicks.some((c) => t >= c && t < c + 0.12);
+  ctx.save(); ctx.translate(px, py); if (down) ctx.scale(0.86, 0.86);
+  ctx.fillStyle = BRAND.black; ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 44); ctx.lineTo(12, 34); ctx.lineTo(22, 56); ctx.lineTo(32, 51); ctx.lineTo(22, 31); ctx.lineTo(38, 31); ctx.closePath(); ctx.stroke(); ctx.fill();
+  ctx.restore();
+}
+function lockIcon(ctx, cx, cy, s, col) {
+  ctx.strokeStyle = col; ctx.lineWidth = s * 0.16; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(cx, cy - s * 0.2, s * 0.3, Math.PI, 0); ctx.stroke();
+  ctx.fillStyle = col; roundRect(ctx, cx - s * 0.5, cy - s * 0.2, s, s * 0.75, s * 0.14); ctx.fill();
+}
+
+// Panel ilustrado "como me lo entregaron": opciones limitadas y un botón "Solicitar cambio".
+function drawPanelWire(ctx, x, y, w, h, l, t) {
+  const b0 = l.buildAt, st = (a, d = 0.35) => (b0 == null ? 1 : clamp((t - b0 - a) / d, 0, 1));
+  ctx.fillStyle = '#F4F5F8'; ctx.fillRect(x, y, w, h);
+  const sw = 190;
+  ctx.save(); ctx.globalAlpha *= st(0); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, sw, h);
+  ctx.fillStyle = BRAND.black; ctx.beginPath(); ctx.arc(x + 48, y + 52, 22, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  [['Resumen', 0], ['Mis fotos', 1], ['Textos', 2], ['Diseño', 2]].forEach(([lab, k], i) => {
+    const q = st(0.12 + i * 0.1), ry = y + 130 + i * 70;
+    ctx.save(); ctx.globalAlpha *= q; ctx.translate(-(1 - eo(q)) * 18, 0);
+    if (i === 1) { ctx.fillStyle = '#E6F4FF'; roundRect(ctx, x + 14, ry - 26, sw - 28, 52, 14); ctx.fill(); }
+    ctx.fillStyle = k === 2 ? 'rgba(11,11,11,.35)' : BRAND.black; ctx.font = `700 25px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(lab, x + 34, ry + 1);
+    if (k === 2) lockIcon(ctx, x + sw - 42, ry, 18, 'rgba(11,11,11,.35)');
+    ctx.restore();
+  });
+  const mx = x + sw + 36, qh = st(0.35);
+  ctx.save(); ctx.globalAlpha *= qh; ctx.fillStyle = BRAND.black; ctx.font = `700 34px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('Mis fotos', mx, y + 54); ctx.restore();
+  // tarjeta de la foto
+  const qc = st(0.5, 0.45), cw = 360, chh = 250, cy0 = y + 110;
+  ctx.save(); ctx.globalAlpha *= qc; ctx.translate(0, (1 - eo(qc)) * 24);
+  ctx.shadowColor = 'rgba(0,0,0,.12)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8; ctx.fillStyle = '#FFFFFF'; roundRect(ctx, mx, cy0, cw, chh + 70, 22); ctx.fill(); ctx.shadowColor = 'transparent';
+  ctx.save(); roundRect(ctx, mx + 14, cy0 + 14, cw - 28, chh - 14, 14); ctx.clip(); samplePhoto(ctx, mx + 14, cy0 + 14, cw - 28, chh - 14, 0); ctx.restore();
+  ctx.fillStyle = BRAND.black; roundRect(ctx, mx + 28, cy0 + chh - 50, 210, 44, 22); ctx.fill(); lockIcon(ctx, mx + 56, cy0 + chh - 30, 18, BRAND.ivory);
+  ctx.fillStyle = BRAND.ivory; ctx.font = `700 22px ${FONTS.body}`; ctx.fillText('Solo lectura', mx + 84, cy0 + chh - 27);
+  ctx.fillStyle = BRAND.black; ctx.font = `700 24px ${FONTS.body}`; ctx.fillText('Portada', mx + 22, cy0 + chh + 40);
+  ctx.restore();
+  // botón: Solicitar cambio
+  const qb = st(0.8, 0.4), bcx = mx + cw / 2, bcy = y + h - 70, bw = 340, bh = 70;
+  const pressed = (l.clicks || []).some((c) => t >= c && t < c + 0.14);
+  ctx.save(); ctx.globalAlpha *= qb; ctx.translate(bcx, bcy + (1 - eo(qb)) * 18); if (pressed) ctx.scale(0.94, 0.94);
+  ctx.fillStyle = BRAND.black; roundRect(ctx, -bw / 2, -bh / 2, bw, bh, 35); ctx.fill();
+  ctx.fillStyle = BRAND.ivory; ctx.font = `700 29px ${FONTS.body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Solicitar cambio', 0, 2); ctx.restore();
+  // opciones limitadas
+  if (l.menuAt != null && t >= l.menuAt) {
+    const q = eo(clamp((t - l.menuAt) / 0.22, 0, 1)), ox = mx + cw + 28, oy = y + 150, ow = w - (ox - x) - 28, rh = 62;
+    ctx.save(); ctx.globalAlpha *= q; ctx.translate(0, (1 - q) * 14);
+    ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 28; ctx.shadowOffsetY = 10; ctx.fillStyle = '#FFFFFF'; roundRect(ctx, ox, oy, ow, rh * 3 + 20, 20); ctx.fill(); ctx.shadowColor = 'transparent';
+    ['Enviar solicitud', 'Ver estado', 'Editar directo'].forEach((lab, i) => {
+      const ry = oy + 10 + i * rh;
+      ctx.fillStyle = i === 2 ? 'rgba(11,11,11,.35)' : BRAND.black; ctx.font = `700 24px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(lab, ox + 24, ry + rh / 2 + 1);
+      if (i === 2) lockIcon(ctx, ox + ow - 40, ry + rh / 2, 18, 'rgba(11,11,11,.35)');
+    });
+    ctx.restore();
+  }
+  drawCursorFx(ctx, x, y, w, h, l, t);
+}
+
+// Editor ilustrado "como lo dejo yo": el cliente cambia la imagen solo.
+function drawEditorWire(ctx, x, y, w, h, l, t) {
+  const b0 = l.buildAt, st = (a, d = 0.35) => (b0 == null ? 1 : clamp((t - b0 - a) / d, 0, 1));
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, w, h);
+  ctx.save(); ctx.globalAlpha *= st(0); ctx.fillStyle = BRAND.black; roundRect(ctx, x + 32, y + 26, 46, 46, 23); ctx.fill(); ctx.restore();
+  for (let i = 0; i < 3; i++) { ctx.save(); ctx.globalAlpha *= st(0.1 + i * 0.1); ctx.fillStyle = 'rgba(11,11,11,.4)'; roundRect(ctx, x + w - 430 + i * 130, y + 40, 90, 18, 9); ctx.fill(); ctx.restore(); }
+  const hy = y + 100, hh = h * 0.5, pw = eo(st(0.3, 0.6));
+  if (pw > 0) {
+    ctx.save(); ctx.beginPath(); ctx.rect(x + 32, hy - 4, (w - 64) * pw, hh + 8); ctx.clip();
+    ctx.save(); roundRect(ctx, x + 32, hy, w - 64, hh, 22); ctx.clip();
+    samplePhoto(ctx, x + 32, hy, w - 64, hh, 0);
+    if (l.swapAt != null && t >= l.swapAt) { const sq = eo(clamp((t - l.swapAt) / 0.35, 0, 1)); ctx.globalAlpha = sq; samplePhoto(ctx, x + 32, hy, w - 64, hh, 1); ctx.globalAlpha = 1; if (t < l.swapAt + 0.3) { ctx.fillStyle = `rgba(255,255,255,${0.7 * (1 - (t - l.swapAt) / 0.3)})`; ctx.fillRect(x, hy, w, hh); } }
+    ctx.restore(); ctx.restore();
+    // selección de la imagen al acercar el cursor
+    if (l.selectAt != null && t >= l.selectAt && (l.swapAt == null || t < l.swapAt + 1.4)) {
+      ctx.strokeStyle = BRAND.coral; ctx.lineWidth = 5; ctx.setLineDash([16, 10]); roundRect(ctx, x + 32, hy, w - 64, hh, 22); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  // control "Cambiar imagen"
+  const qb = st(0.9, 0.35), bw = 270, bh = 62, bcx = x + w - 32 - bw / 2 - 20, bcy = hy + hh - bh / 2 - 20;
+  const pressed = (l.clicks || []).some((c) => t >= c && t < c + 0.14);
+  if (l.selectAt != null && t >= l.selectAt) {
+    ctx.save(); ctx.globalAlpha *= clamp((t - l.selectAt) / 0.2, 0, 1); ctx.translate(bcx, bcy); if (pressed) ctx.scale(0.94, 0.94);
+    ctx.fillStyle = BRAND.black; roundRect(ctx, -bw / 2, -bh / 2, bw, bh, 31); ctx.fill();
+    ctx.fillStyle = BRAND.ivory; ctx.font = `700 26px ${FONTS.body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Cambiar imagen', 0, 2); ctx.restore();
+  }
+  // tarjetas
+  const cy = hy + hh + 30, cw = (w - 64 - 48) / 3, ch = Math.max(40, y + h - cy - 24);
+  for (let i = 0; i < 3; i++) { const pc = st(1.0 + i * 0.12); ctx.save(); ctx.globalAlpha *= pc; ctx.translate(0, (1 - eo(pc)) * 22); ctx.fillStyle = ['#E6F4FF', '#FFE0EE', '#D2F5E7'][i]; roundRect(ctx, x + 32 + i * (cw + 24), cy, cw, ch, 18); ctx.fill(); ctx.restore(); }
+  // confirmación
+  if (l.swapAt != null && t >= l.swapAt + 0.3 && t < l.swapAt + 2.4) {
+    const q = eo(clamp((t - l.swapAt - 0.3) / 0.25, 0, 1)) * clamp((l.swapAt + 2.4 - t) / 0.3, 0, 1);
+    ctx.save(); ctx.globalAlpha *= q; ctx.translate(x + w / 2, y + h - 48 - (1 - q) * 12);
+    ctx.fillStyle = BRAND.green; roundRect(ctx, -170, -30, 340, 60, 30); ctx.fill(); ctx.fillStyle = BRAND.black; ctx.font = `700 26px ${FONTS.body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Cambio guardado', 0, 2); ctx.restore();
+  }
+  drawCursorFx(ctx, x, y, w, h, l, t);
+}
+
 function drawMockup(ctx, l, t = 0) {
   const a = assets.get(l.asset);
   const { w, h } = l;
@@ -437,7 +569,7 @@ function drawMockup(ctx, l, t = 0) {
     ctx.fillText(l.url || 'ursulahr.cl', 30, -h / 2 + bar / 2 + 1);
     ctx.save();
     ctx.beginPath(); ctx.rect(-w / 2, -h / 2 + bar, w, h - bar); ctx.clip();
-    if (l.wire && !a) drawWire(ctx, -w / 2, -h / 2 + bar, w, h - bar, l, t); // si hay grabación asignada, manda la grabación
+    if (l.wire && !a) (l.wire === 'panel' ? drawPanelWire : l.wire === 'editor' ? drawEditorWire : drawWire)(ctx, -w / 2, -h / 2 + bar, w, h - bar, l, t); // si hay grabación asignada, manda la grabación
     else if (!drawMedia(ctx, a, -w / 2, -h / 2 + bar, w, h - bar, l.fit, l)) placeholder(ctx, -w / 2, -h / 2 + bar, w, h - bar, l.placeholder);
     ctx.restore();
     ctx.restore();
@@ -512,12 +644,124 @@ function drawCaption(ctx, l, t) {
   });
 }
 
+// ---------- chat (recreación de una conversación) ----------
+// Capa de conversación editorial, calculada solo desde el tiempo (reproducir, retroceder y exportar dan lo mismo).
+// Props: msgs [{from:'me'|'them', name, text, at, y, maxW, tag, tagColor, type (s de escritura), out (s), hl, hlAt, dim:[[t,a]]}
+//             | {kind:'wait', at, until, y, label}]
+//        cam [[t, zoom, cy, cx]] (cámara dentro de la capa), alphaKf [[t, a]], tag ('RECREACIÓN'), note, noteUntil, size.
+function wrapLines(ctx, text, maxW) {
+  const words = text.split(/\s+/); const lines = []; let cur = '';
+  for (const w of words) { const test = cur ? cur + ' ' + w : w; if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = w; } else cur = test; }
+  if (cur) lines.push(cur);
+  return lines;
+}
+function drawChat(ctx, l, t) {
+  const w = l.w, h = l.h, size = l.size || 62, lh = Math.round(size * 1.2), pad = Math.round(size * 0.5);
+  const alpha = kfValue(l.alphaKf, t, [1])[0];
+  const msgs = l.msgs || [];
+  // insignia fija (no se mueve con la cámara) y nota inicial
+  ctx.save(); ctx.globalAlpha *= clamp((alpha - 0.15) / 0.5, 0, 1);
+  const badge = (l.tag ?? 'RECREACIÓN');
+  if (badge) {
+    ctx.font = `700 40px ${FONTS.body}`; ctx.letterSpacing = '5px';
+    const bw = ctx.measureText(badge).width + 64, by = -h / 2 + 34;
+    ctx.fillStyle = BRAND.coral; roundRect(ctx, -bw / 2, by - 36, bw, 72, 36); ctx.fill();
+    ctx.fillStyle = BRAND.black; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(badge, 2, by + 2); ctx.letterSpacing = '0px';
+    const nt = l.noteUntil ?? 4;
+    if (l.note && t < nt) {
+      const q = clamp((nt - t) / 0.4, 0, 1) * clamp(t / 0.4, 0, 1);
+      ctx.globalAlpha *= q; ctx.font = `700 31px ${FONTS.body}`; ctx.fillStyle = 'rgba(11,11,11,.72)'; ctx.fillText(l.note, 0, by + 66);
+    }
+  }
+  ctx.restore();
+  // cámara
+  const cam = kfValue(l.cam, t, [1, 0, 0]); const zoom = cam[0], cy = cam[1] || 0, cx = cam[2] || 0;
+  ctx.save(); ctx.scale(zoom, zoom); ctx.translate(-cx, -cy);
+  // atenuado de las burbujas que no son el foco ("4 meses")
+  let others = 1;
+  msgs.forEach((m) => { if (m.hl && m.hlAt != null && t >= m.hlAt && (m.out == null || t < m.out)) others = Math.min(others, 1 - 0.78 * eo(clamp((t - m.hlAt) / 0.4, 0, 1))); });
+  const ph = Math.round(size * 0.9);
+  msgs.forEach((m) => {
+    if (t < m.at) return;
+    const e = clamp((t - m.at) / 0.28, 0, 1);
+    const xo = m.out != null ? clamp((t - m.out) / 0.3, 0, 1) : 0;
+    let a = e * (1 - xo) * kfValue(m.dim, t, [1])[0] * clamp(alpha, 0, 1);
+    if (a <= 0.002) return;
+    const y0 = (m.y || 0) + (1 - eo(e)) * 40 - eo(xo) * 50;
+    const me = m.from === 'me';
+    const edge = me ? w / 2 - 30 : -w / 2 + 30;
+    if (m.kind === 'wait') {
+      const prog = clamp((t - m.at) / Math.max(0.1, (m.until - m.at)), 0, 1);
+      ctx.save(); ctx.globalAlpha *= a * (m.hl === undefined && others < 1 ? others : 1);
+      const bw = 520, bh = 112, bx = -w / 2 + 30;
+      ctx.setLineDash([16, 12]); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(11,11,11,.4)'; roundRect(ctx, bx, y0, bw, bh, 40); ctx.stroke(); ctx.setLineDash([]);
+      const q = clamp((prog - 0.5) / 0.3, 0, 1);
+      ctx.globalAlpha *= q; ctx.fillStyle = 'rgba(11,11,11,.6)'; ctx.font = `700 40px ${FONTS.body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(m.label || 'Sin respuesta', bx + bw / 2, y0 + bh / 2 + 2);
+      ctx.restore();
+      // línea punteada que avanza
+      ctx.save(); ctx.globalAlpha *= a * (others < 1 ? others : 1);
+      const ly = y0 + bh + 56, x1 = -w / 2 + 30, x2 = w / 2 - 30, xe = x1 + (x2 - x1) * eo(prog);
+      ctx.strokeStyle = BRAND.coral; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.setLineDash([2, 22]);
+      ctx.beginPath(); ctx.moveTo(x1, ly); ctx.lineTo(xe, ly); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = BRAND.coral; ctx.beginPath(); ctx.arc(xe, ly, 13 + 3 * Math.sin(t * 7), 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      return;
+    }
+    ctx.font = `700 ${size}px ${FONTS.body}`;
+    const maxW = Math.min(m.maxW || 640, w - 60);
+    const lines = wrapLines(ctx, m.text, maxW - pad * 2);
+    const tw = Math.max(...lines.map((x) => ctx.measureText(x).width), 40);
+    const bw = tw + pad * 2, bh = lines.length * lh + pad * 2 - Math.round(size * 0.1);
+    const bx = me ? edge - bw : edge;
+    const isFocus = !!(m.hl && m.hlAt != null && t >= m.hlAt && (m.out == null || t < m.out));
+    ctx.save(); ctx.globalAlpha *= a * (isFocus ? 1 : others);
+    const cxm = bx + bw / 2, cym = y0 + bh / 2; ctx.translate(cxm, cym); const sc = 0.94 + 0.06 * eo(e) - 0.03 * eo(xo); ctx.scale(sc, sc); ctx.translate(-cxm, -cym);
+    let yy = y0;
+    if (m.tag) {
+      ctx.font = `700 30px ${FONTS.body}`; ctx.letterSpacing = '3px';
+      const tl = m.tag.toUpperCase(), tpw = ctx.measureText(tl).width + 44;
+      ctx.fillStyle = m.tagColor || (me ? BRAND.sky : BRAND.sun); roundRect(ctx, me ? edge - tpw : edge, yy, tpw, 50, 25); ctx.fill();
+      ctx.fillStyle = BRAND.black; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(tl, (me ? edge - tpw : edge) + 24, yy + 26); ctx.letterSpacing = '0px';
+      yy += 64;
+    }
+    ctx.font = `700 28px ${FONTS.body}`; ctx.letterSpacing = '3px'; ctx.fillStyle = 'rgba(11,11,11,.6)'; ctx.textBaseline = 'middle';
+    const nm = (m.name || (me ? 'Cliente' : 'Soporte web')).toUpperCase();
+    ctx.textAlign = me ? 'right' : 'left'; ctx.fillText(nm, edge, yy + 18); ctx.letterSpacing = '0px'; yy += 46;
+    // burbuja
+    ctx.fillStyle = me ? BRAND.sky : BRAND.black; roundRect(ctx, bx, yy, bw, bh, 44); ctx.fill();
+    // texto, letra por letra
+    const dur = m.type ?? clamp(m.text.length * 0.03, 0.5, 0.8), tS = m.at + 0.28;
+    const prog = clamp((t - tS) / dur, 0, 1), n = Math.floor(m.text.length * prog + (prog > 0 ? 1e-6 : 0));
+    ctx.font = `700 ${size}px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    const fg = me ? BRAND.black : BRAND.ivory;
+    let off = 0, lastX = bx + pad, lastY = yy + pad + lh / 2 - 2;
+    const hlq = isFocus ? eo(clamp((t - m.hlAt) / 0.3, 0, 1)) : 0;
+    lines.forEach((ln, i) => {
+      const shown = ln.slice(0, clamp(n - off, 0, ln.length));
+      const ty = yy + pad - Math.round(size * 0.05) + lh * i + lh / 2;
+      const hi = m.hl ? ln.indexOf(m.hl) : -1;
+      if (hi >= 0 && hlq > 0) {
+        const hx = bx + pad + ctx.measureText(ln.slice(0, hi)).width, hw = ctx.measureText(m.hl).width;
+        ctx.fillStyle = BRAND.sun; roundRect(ctx, hx - 12, ty - lh * 0.46, (hw + 24) * hlq, lh * 0.92, 16); ctx.fill();
+        ctx.fillStyle = fg; ctx.globalAlpha *= 0.45; ctx.fillText(ln.slice(0, hi), bx + pad, ty); ctx.fillText(ln.slice(hi + m.hl.length), hx + hw, ty); ctx.globalAlpha /= 0.45;
+        ctx.fillStyle = BRAND.black; ctx.fillText(m.hl, hx, ty);
+      } else { ctx.fillStyle = fg; ctx.globalAlpha *= (isFocus ? 0.45 : 1) ; ctx.fillText(shown, bx + pad, ty); ctx.globalAlpha /= (isFocus ? 0.45 : 1); }
+      if (clamp(n - off, 0, ln.length) > 0 || i === 0) { lastX = bx + pad + ctx.measureText(shown).width; lastY = ty; }
+      off += ln.length + 1;
+    });
+    if (prog > 0 && prog < 1 && Math.floor(t * 6) % 2 === 0) { ctx.fillStyle = me ? 'rgba(11,11,11,.7)' : 'rgba(245,241,232,.8)'; ctx.fillRect(lastX + 4, lastY - lh * 0.36, 5, lh * 0.72); }
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
 // ---------- capas ----------
 const DRAW = {
   text: (ctx, l, t) => drawText(ctx, l, t),
   shape: drawShape,
   image: (ctx, l) => drawImageLayer(ctx, l),
   mockup: (ctx, l, t) => drawMockup(ctx, l, t),
+  chat: (ctx, l, t) => drawChat(ctx, l, t),
   caption: (ctx, l, t) => drawCaption(ctx, l, t),
   logo: (ctx, l) => {
     const img = logos[l.variant === 'light' ? 'light' : 'dark'];

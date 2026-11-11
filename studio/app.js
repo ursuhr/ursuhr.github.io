@@ -118,7 +118,7 @@ async function loadTemplate(name) {
 }
 
 // ---------- capas ----------
-const TYPE_ICON = { text: 'T', shape: '◆', image: 'I', mockup: 'M', caption: 'S', logo: 'HR', sound: '♪' };
+const TYPE_ICON = { text: 'T', shape: '◆', image: 'I', mockup: 'M', caption: 'S', logo: 'HR', sound: '♪', chat: 'C' };
 const NEW_LAYER = {
   text: ['Texto', { type: 'text', text: 'Tu *título* aquí', font: 'title', size: 96, color: BRAND.black, accent: BRAND.coral, align: 'left', lh: 1.05, w: 880, h: 200, animIn: 'rise', animOut: 'fade' }],
   caption: ['Subtítulos', { type: 'caption', text: 'Escribe aquí lo que dice la voz', size: 54, y: 1440, w: 960, h: 110, capStyle: 'pill', maxWords: 4, accent: BRAND.coral, animIn: 'fade' }],
@@ -131,6 +131,7 @@ const NEW_LAYER = {
   arrow: ['Flecha', { type: 'shape', kind: 'arrow', w: 90, h: 90, color: BRAND.coral, animIn: 'draw' }],
   sparkle: ['Destello', { type: 'shape', kind: 'sparkle', w: 90, h: 90, color: BRAND.black, animIn: 'pop' }],
   squiggle: ['Línea orgánica', { type: 'shape', kind: 'squiggle', w: 600, h: 60, stroke: 14, animIn: 'draw' }],
+  chat: ['Chat (recreación)', { type: 'chat', tag: 'RECREACIÓN', note: 'Basada en el relato de un cliente · Mensajes resumidos', noteUntil: 4, size: 62, w: 960, h: 1100, y: 900, animIn: 'none', animOut: 'none', msgs: [{ from: 'me', text: '¿Podemos cambiar esta foto?', at: 0.5, y: -120, maxW: 640, tag: 'Solicitud' }, { from: 'them', text: 'Agenda llena por 4 meses', at: 3, y: 150, maxW: 640, tag: 'Más adelante' }] }],
   logo: ['Logo HR', { type: 'logo', variant: 'dark', w: 150, h: 100 }],
 };
 
@@ -347,7 +348,7 @@ $('#btnAdd').onclick = (e) => openMenu(e.currentTarget, [
   ['Mockup navegador', () => addLayer('browser')], ['Mockup celular', () => addLayer('phone')],
   ['Imagen o video', () => addLayer('image')], ['Botón (pill)', () => addLayer('pill')],
   ['Tarjeta', () => addLayer('card')], ['Halo', () => addLayer('halo')], ['Flecha', () => addLayer('arrow')],
-  ['Destello', () => addLayer('sparkle')], ['Línea orgánica', () => addLayer('squiggle')], ['Logo HR', () => addLayer('logo')],
+  ['Destello', () => addLayer('sparkle')], ['Línea orgánica', () => addLayer('squiggle')], ['Chat (recreación)', () => addLayer('chat')], ['Logo HR', () => addLayer('logo')],
 ]);
 
 // ---------- inspector ----------
@@ -375,6 +376,7 @@ const SCHEMA = {
     F('radius', 'Radio', 'number', { step: 4 }), F('shadow', 'Sombra', 'checkbox'), ...MEDIA_FIELDS],
   mockup: [F('kind', 'Dispositivo', 'select', { options: [['browser', 'Navegador'], ['phone', 'Celular']] }), F('asset', 'Medio', 'asset'),
     F('url', 'URL (navegador)', 'text'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }), ...MEDIA_FIELDS],
+  chat: [F('msgs', 'Mensajes', 'msgs'), F('tag', 'Insignia fija', 'text'), F('note', 'Nota inicial', 'text'), F('noteUntil', 'Nota hasta (s)', 'number', { step: 0.1 }), F('size', 'Tamaño texto', 'number', { step: 2 })],
   logo: [F('variant', 'Versión', 'select', { options: [['dark', 'Negro'], ['light', 'Marfil']] })],
   sound: [F('asset', 'Sonido', 'asset', { sound: true }), F('volume', 'Volumen (0 a 1,5)', 'number', { step: 0.01, def: () => 0.35 }),
     F('fadeIn', 'Entrada gradual (s)', 'number', { step: 0.1, def: () => 0 }), F('fadeOut', 'Salida gradual (s)', 'number', { step: 0.1, def: () => 0 })],
@@ -386,7 +388,17 @@ function fieldRow(l, f) {
   const get = () => (l[f.key] !== undefined ? l[f.key] : f.def ? f.def(l) : f.type === 'number' && f.key === 'speed' ? 1 : f.type === 'number' ? 0 : '');
   const set = (v, final) => { l[f.key] = v; paint(); updateOverlay(); if (final) { commit(); refreshLists(); } };
   let input;
-  if (f.type === 'textarea') input = el('textarea', { oninput: (e) => { set(e.target.value); }, onchange: () => commit() });
+  if (f.type === 'msgs') {
+    // una línea por mensaje:  emisor | entra (s) | posición y | texto     (emisor: cliente o soporte)
+    input = el('textarea', { rows: 8, onchange: (e) => {
+      const old = l.msgs || [];
+      l.msgs = e.target.value.split('\n').map((ln) => ln.trim()).filter(Boolean).map((ln, i) => {
+        const [who, at, y, ...rest] = ln.split('|').map((x) => x.trim());
+        return { ...(old[i] || { maxW: 640 }), from: /^c/i.test(who) ? 'me' : 'them', at: parseFloat(at) || 0, y: parseFloat(y) || 0, text: rest.join('|').trim() };
+      });
+      commit(); paint(); updateOverlay(); } });
+    input.dataset.fmt = 'msgs';
+  } else if (f.type === 'textarea') input = el('textarea', { oninput: (e) => { set(e.target.value); }, onchange: () => commit() });
   else if (f.type === 'text') input = el('input', { type: 'text', oninput: (e) => set(e.target.value), onchange: () => commit() });
   else if (f.type === 'number') input = el('input', { type: 'number', step: f.step || 1, oninput: (e) => { if (e.target.value !== '') set(parseFloat(e.target.value)); }, onchange: () => commit() });
   else if (f.type === 'checkbox') { input = el('input', { type: 'checkbox', onchange: (e) => set(e.target.checked, true) }); }
@@ -416,7 +428,8 @@ function fillValues() {
     const { input, f, get } = o;
     if (document.activeElement === input) continue;
     const v = get();
-    if (f.type === 'checkbox') input.checked = !!v;
+    if (f.type === 'msgs') { if (document.activeElement !== input) input.value = (l.msgs || []).filter((m) => m.kind !== 'wait').map((m) => `${m.from === 'me' ? 'cliente' : 'soporte'} | ${m.at} | ${m.y || 0} | ${m.text}`).join('\n'); }
+    else if (f.type === 'checkbox') input.checked = !!v;
     else if (f.type === 'asset') {
       const reg = f.sound ? sounds : assets;
       const names = [...reg.keys()];
@@ -729,7 +742,7 @@ $('#fileAudio').onchange = async (e) => {
     const buf = await setVoice(f, f.name);
     saveFile('voice', f, 'voice', f.name);
     const d = round(buf.duration, 1);
-    if (Math.abs(d - S.P.duration) > 0.5 && confirm(`El audio dura ${d} s y el reel ${S.P.duration} s.\n¿Escalar todos los tiempos para que calcen con el audio?\n(Después puedes afinar cada escena en la línea de tiempo.)`)) {
+    if ((d - S.P.duration > 0.5 || S.P.duration - d > 3.5) && confirm(`El audio dura ${d} s y el reel ${S.P.duration} s.\n¿Escalar todos los tiempos para que calcen con el audio?\n(Después puedes afinar cada escena en la línea de tiempo.)`)) {
       const k = d / S.P.duration;
       S.P.layers.forEach((l) => { l.start = round(l.start * k, 2); l.end = round(l.end * k, 2); });
       S.P.duration = d; $('#durInput').value = d;
@@ -764,6 +777,7 @@ $('#btnScript').onclick = () => {
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
   ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
+  ['Reel: Un millón por cambiar una foto', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('millon-foto')],
   ['Reel: Los $200.000 por las claves (historia)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('clienta-200k')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
   ['Borrar archivos guardados', async () => { if (confirm('Se borran las grabaciones, sonidos y la voz guardados en este navegador. ¿Continuar?')) { await clearFiles(); toast('Listo. Recarga la página para empezar limpio.'); } }],
