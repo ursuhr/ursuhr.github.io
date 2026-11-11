@@ -1,6 +1,6 @@
 {
  "template": "clienta-200k",
- "rev": 6,
+ "rev": 7,
  "name": "Reel · Los $200.000 por las claves",
  "width": 1080,
  "height": 1920,
@@ -545,6 +545,8 @@
    "wire": "new",
    "url": "tu-web-nueva.cl",
    "buildAt": 19.7,
+   "dimAt": 22.1,
+   "dimTo": 0.35,
    "move": [
     [
      19.5,
@@ -714,9 +716,9 @@
    "animOut": "fade",
    "animDur": 0.45,
    "kind": "pill",
-   "color": "#FFFFFF",
+   "color": "#0B0B0B",
    "label": "Administra: tú",
-   "labelColor": "#0B0B0B",
+   "labelColor": "#F5F1E8",
    "labelSize": 34,
    "shadow": true
   },
@@ -736,10 +738,11 @@
    "animOut": "fade",
    "animDur": 0.45,
    "kind": "pill",
-   "color": "#0B0B0B",
+   "color": "#FF6BA7",
    "label": "Administra: otra persona",
-   "labelColor": "#F5F1E8",
-   "labelSize": 34
+   "labelColor": "#0B0B0B",
+   "labelSize": 34,
+   "shadow": true
   },
   {
    "id": "l27",
@@ -757,9 +760,9 @@
    "animOut": "fade",
    "animDur": 0.45,
    "kind": "pill",
-   "color": "#FFFFFF",
+   "color": "#0B0B0B",
    "label": "Servidor: hosting A",
-   "labelColor": "#0B0B0B",
+   "labelColor": "#F5F1E8",
    "labelSize": 34,
    "shadow": true
   },
@@ -779,10 +782,11 @@
    "animOut": "fade",
    "animDur": 0.45,
    "kind": "pill",
-   "color": "#0B0B0B",
+   "color": "#FF6BA7",
    "label": "Servidor: hosting B",
-   "labelColor": "#F5F1E8",
-   "labelSize": 34
+   "labelColor": "#0B0B0B",
+   "labelSize": 34,
+   "shadow": true
   },
   {
    "id": "l29",
@@ -800,7 +804,7 @@
    "animOut": "fade",
    "animDur": 0.45,
    "kind": "pill",
-   "color": "#FF6BA7",
+   "color": "#34D399",
    "label": "Sin empezar de cero",
    "labelColor": "#0B0B0B",
    "labelSize": 34,

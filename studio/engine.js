@@ -552,7 +552,9 @@ export function drawLayer(ctx, l, t) {
   const drift0 = l.drift ? 1 + l.drift * clamp((t - l.start) / Math.max(0.01, l.end - l.start), 0, 1) : 1;
   const sc = st.sc * drift0 * hit * ksc * (1 - 0.18 * rec);
   if (sc !== 1) ctx.scale(sc, sc);
-  ctx.globalAlpha = clamp((l.opacity ?? 1) * st.a * (1 - 0.6 * rec), 0, 1);
+  // dimAt/dimTo: la capa se vuelve semitransparente a partir de ese segundo (para que el texto encima se lea)
+  const dim = l.dimAt != null && t >= l.dimAt ? 1 - (1 - (l.dimTo ?? 0.4)) * eo(clamp((t - l.dimAt) / 0.5, 0, 1)) : 1;
+  ctx.globalAlpha = clamp((l.opacity ?? 1) * st.a * (1 - 0.6 * rec) * dim, 0, 1);
   if (st.blur > 0.5) ctx.filter = `blur(${st.blur}px)`;
   try { (DRAW[l.type] || (() => {}))(ctx, l, t, st); } finally { ctx.restore(); }
 }
