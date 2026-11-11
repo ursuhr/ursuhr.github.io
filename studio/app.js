@@ -754,6 +754,7 @@ $('#btnScript').onclick = () => {
 // plantillas, abrir y guardar
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
+  ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
   ['Borrar archivos guardados', async () => { if (confirm('Se borran las grabaciones, sonidos y la voz guardados en este navegador. ¿Continuar?')) { await clearFiles(); toast('Listo. Recarga la página para empezar limpio.'); } }],
 ]);
