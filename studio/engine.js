@@ -209,6 +209,14 @@ function drawShape(ctx, l, t, st) {
       ctx.stroke();
       break;
     }
+    case 'key': {
+      const k = l.w, lw = l.stroke || k * 0.07;
+      ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.arc(-k * 0.3, 0, k * 0.17, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-k * 0.13, 0); ctx.lineTo(k * 0.42, 0);
+      ctx.moveTo(k * 0.26, 0); ctx.lineTo(k * 0.26, k * 0.16); ctx.moveTo(k * 0.42, 0); ctx.lineTo(k * 0.42, k * 0.11); ctx.stroke();
+      break;
+    }
     case 'circle':
       ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(0, 0, l.w / 2, l.h / 2, 0, 0, Math.PI * 2); ctx.fill(); break;
     case 'rect':
@@ -265,7 +273,51 @@ function drawImageLayer(ctx, l) {
   ctx.restore();
 }
 
-function drawMockup(ctx, l) {
+// Página ilustrada para el navegador: wire 'old' (gris) o 'new' (con tu paleta). lockAt = segundo en que aparece el aviso de permisos.
+function drawWire(ctx, x, y, w, h, l, t) {
+  const nw = l.wire === 'new';
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = nw ? BRAND.black : '#CBD2DC'; roundRect(ctx, x + 32, y + 28, 46, 46, 23); ctx.fill();
+  for (let i = 0; i < 3; i++) { ctx.fillStyle = nw ? 'rgba(11,11,11,.5)' : '#DDE2EA'; roundRect(ctx, x + w - 340 + i * 104, y + 42, 80, 18, 9); ctx.fill(); }
+  const hy = y + 110, hh = h * 0.38;
+  if (nw) {
+    const g = ctx.createLinearGradient(x + 32, hy, x + w - 32, hy + hh);
+    g.addColorStop(0, BRAND.coral); g.addColorStop(0.5, BRAND.sun); g.addColorStop(1, BRAND.green); ctx.fillStyle = g;
+  } else ctx.fillStyle = '#E9ECF1';
+  roundRect(ctx, x + 32, hy, w - 64, hh, 22); ctx.fill();
+  ctx.fillStyle = nw ? BRAND.black : '#C5CCD6';
+  roundRect(ctx, x + 72, hy + hh * 0.26, w * 0.42, 30, 15); ctx.fill();
+  roundRect(ctx, x + 72, hy + hh * 0.26 + 48, w * 0.3, 30, 15); ctx.fill();
+  if (nw) { ctx.fillStyle = BRAND.black; roundRect(ctx, x + 72, hy + hh * 0.26 + 110, 170, 52, 26); ctx.fill(); }
+  const cy = hy + hh + 30, cw = (w - 64 - 48) / 3, ch = Math.max(40, y + h - cy - 24);
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = nw ? ['#FFE0EE', '#FFF1C7', '#D2F5E7'][i] : '#EEF1F5'; roundRect(ctx, x + 32 + i * (cw + 24), cy, cw, ch, 18); ctx.fill();
+    ctx.fillStyle = nw ? 'rgba(11,11,11,.45)' : '#CBD2DC'; roundRect(ctx, x + 52 + i * (cw + 24), cy + 22, cw * 0.6, 16, 8); ctx.fill();
+  }
+  if (l.lockAt != null && t >= l.lockAt) {
+    const p = clamp((t - l.lockAt) / 0.35, 0, 1);
+    ctx.fillStyle = `rgba(11,11,11,${0.38 * p})`; ctx.fillRect(x, y, w, h);
+    const mw = Math.min(w - 120, 560), mh = 300;
+    ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.scale(0.7 + 0.3 * eb(p), 0.7 + 0.3 * eb(p)); ctx.globalAlpha *= clamp(p * 2, 0, 1);
+    ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
+    ctx.fillStyle = '#FFFFFF'; roundRect(ctx, -mw / 2, -mh / 2, mw, mh, 28); ctx.fill(); ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = BRAND.coral; ctx.lineWidth = 9; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, -72, 26, Math.PI, 0); ctx.lineTo(26, -50); ctx.moveTo(-26, -72); ctx.lineTo(-26, -50); ctx.stroke();
+    ctx.fillStyle = BRAND.coral; roundRect(ctx, -42, -52, 84, 66, 14); ctx.fill();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = BRAND.black; ctx.font = `700 40px ${FONTS.body}`; ctx.fillText(l.lockTitle || 'Permisos limitados', 0, 56);
+    ctx.fillStyle = 'rgba(11,11,11,.55)'; ctx.font = `400 27px ${FONTS.body}`; ctx.fillText(l.lockText || 'Se necesita rol de administrador', 0, 102);
+    ctx.restore();
+  }
+  if (l.cursor) {
+    const px = x + w * l.cursor[0], py = y + h * l.cursor[1];
+    ctx.fillStyle = BRAND.black; ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py + 44); ctx.lineTo(px + 12, py + 34); ctx.lineTo(px + 22, py + 56);
+    ctx.lineTo(px + 32, py + 51); ctx.lineTo(px + 22, py + 31); ctx.lineTo(px + 38, py + 31); ctx.closePath(); ctx.stroke(); ctx.fill();
+  }
+}
+
+function drawMockup(ctx, l, t = 0) {
   const a = assets.get(l.asset);
   const { w, h } = l;
   if (l.kind === 'phone') {
@@ -296,7 +348,8 @@ function drawMockup(ctx, l) {
     ctx.fillText(l.url || 'ursulahr.cl', 30, -h / 2 + bar / 2 + 1);
     ctx.save();
     ctx.beginPath(); ctx.rect(-w / 2, -h / 2 + bar, w, h - bar); ctx.clip();
-    if (!drawMedia(ctx, a, -w / 2, -h / 2 + bar, w, h - bar, l.fit, l)) placeholder(ctx, -w / 2, -h / 2 + bar, w, h - bar, l.placeholder);
+    if (l.wire) drawWire(ctx, -w / 2, -h / 2 + bar, w, h - bar, l, t);
+    else if (!drawMedia(ctx, a, -w / 2, -h / 2 + bar, w, h - bar, l.fit, l)) placeholder(ctx, -w / 2, -h / 2 + bar, w, h - bar, l.placeholder);
     ctx.restore();
     ctx.restore();
   }
@@ -370,7 +423,7 @@ const DRAW = {
   text: (ctx, l) => drawText(ctx, l),
   shape: drawShape,
   image: (ctx, l) => drawImageLayer(ctx, l),
-  mockup: (ctx, l) => drawMockup(ctx, l),
+  mockup: (ctx, l, t) => drawMockup(ctx, l, t),
   caption: (ctx, l, t) => drawCaption(ctx, l, t),
   logo: (ctx, l) => {
     const img = logos[l.variant === 'light' ? 'light' : 'dark'];
@@ -384,7 +437,8 @@ export function drawLayer(ctx, l, t) {
   ctx.save();
   ctx.translate(l.x + st.dx, l.y + st.dy + fl);
   if (l.rot) ctx.rotate((l.rot * Math.PI) / 180);
-  if (st.sc !== 1) ctx.scale(st.sc, st.sc);
+  const drift = l.drift ? 1 + l.drift * clamp((t - l.start) / Math.max(0.01, l.end - l.start), 0, 1) : 1;
+  if (st.sc !== 1 || drift !== 1) ctx.scale(st.sc * drift, st.sc * drift);
   ctx.globalAlpha = clamp((l.opacity ?? 1) * st.a, 0, 1);
   if (st.blur > 0.5) ctx.filter = `blur(${st.blur}px)`;
   try { (DRAW[l.type] || (() => {}))(ctx, l, t, st); } finally { ctx.restore(); }

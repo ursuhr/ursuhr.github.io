@@ -368,7 +368,7 @@ const SCHEMA = {
   caption: [F('text', 'Texto de la voz', 'textarea'), F('size', 'Tamaño', 'number', { step: 2 }),
     F('capStyle', 'Estilo', 'select', { options: [['pill', 'Pill negra'], ['plain-light', 'Texto claro'], ['plain-dark', 'Texto oscuro']] }),
     F('maxWords', 'Palabras por frase', 'number', { step: 1 }), F('color', 'Color texto', 'color'), F('accent', 'Palabra activa', 'color')],
-  shape: [F('kind', 'Forma', 'select', { options: [['halo', 'Halo'], ['pill', 'Pill'], ['rect', 'Tarjeta / rectángulo'], ['circle', 'Círculo'], ['arrow', 'Flecha'], ['sparkle', 'Destello'], ['squiggle', 'Línea orgánica']] }),
+  shape: [F('kind', 'Forma', 'select', { options: [['halo', 'Halo'], ['pill', 'Pill'], ['rect', 'Tarjeta / rectángulo'], ['circle', 'Círculo'], ['arrow', 'Flecha'], ['sparkle', 'Destello'], ['squiggle', 'Línea orgánica'], ['key', 'Llave']] }),
     F('color', 'Color', 'color'), F('color2', 'Color 2', 'color'), F('radius', 'Radio', 'number', { step: 4 }), F('stroke', 'Grosor', 'number', { step: 1 }),
     F('label', 'Texto del botón', 'text'), F('labelColor', 'Color texto', 'color'), F('arrowIcon', 'Flecha en botón', 'checkbox'), F('shadow', 'Sombra', 'checkbox')],
   image: [F('asset', 'Medio', 'asset'), F('fit', 'Ajuste', 'select', { options: [['cover', 'Llenar'], ['contain', 'Contener']] }),
@@ -755,6 +755,7 @@ $('#btnScript').onclick = () => {
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
   ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
+  ['Reel: Los $200.000 por las claves (historia)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('clienta-200k')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
   ['Borrar archivos guardados', async () => { if (confirm('Se borran las grabaciones, sonidos y la voz guardados en este navegador. ¿Continuar?')) { await clearFiles(); toast('Listo. Recarga la página para empezar limpio.'); } }],
 ]);
