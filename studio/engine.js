@@ -477,8 +477,8 @@ function drawPanelWire(ctx, x, y, w, h, l, t) {
   ctx.shadowColor = 'rgba(0,0,0,.12)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8; ctx.fillStyle = '#FFFFFF'; roundRect(ctx, mx, cy0, cw, chh + 70, 22); ctx.fill(); ctx.shadowColor = 'transparent';
   ctx.save(); roundRect(ctx, mx + 14, cy0 + 14, cw - 28, chh - 14, 14); ctx.clip(); samplePhoto(ctx, mx + 14, cy0 + 14, cw - 28, chh - 14, 0); ctx.restore();
   ctx.fillStyle = BRAND.black; roundRect(ctx, mx + 28, cy0 + chh - 50, 210, 44, 22); ctx.fill(); lockIcon(ctx, mx + 56, cy0 + chh - 30, 18, BRAND.ivory);
-  ctx.fillStyle = BRAND.ivory; ctx.font = `700 22px ${FONTS.body}`; ctx.fillText('Solo lectura', mx + 84, cy0 + chh - 27);
-  ctx.fillStyle = BRAND.black; ctx.font = `700 24px ${FONTS.body}`; ctx.fillText('Portada', mx + 22, cy0 + chh + 40);
+  ctx.fillStyle = BRAND.ivory; ctx.font = `700 22px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('Solo lectura', mx + 80, cy0 + chh - 27);
+  ctx.fillStyle = BRAND.black; ctx.font = `700 24px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.fillText('Portada', mx + 22, cy0 + chh + 40);
   ctx.restore();
   // botón: Solicitar cambio
   const qb = st(0.8, 0.4), bcx = mx + cw / 2, bcy = y + h - 70, bw = 340, bh = 70;
@@ -633,6 +633,10 @@ function drawCaption(ctx, l, t) {
   let lastShown = -1;
   chunk.forEach((c, i) => { if (t >= c.t0) lastShown = i; });
   let x = -totalW / 2;
+  if (l.capAlign === 'center' && lastShown >= 0) {
+    let sw = 0; for (let k = 0; k <= lastShown; k++) sw += widths[k] + (k ? space : 0);
+    x = -sw / 2;
+  }
   chunk.forEach((c, i) => {
     if (i <= lastShown) {
       const fade = clamp((t - c.t0) / 0.12, 0, 1);

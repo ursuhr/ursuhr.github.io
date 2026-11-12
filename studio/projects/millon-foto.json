@@ -1,6 +1,6 @@
 {
  "template": "millon-foto",
- "rev": 5,
+ "rev": 6,
  "name": "Reel · Un millón por cambiar una foto",
  "width": 1080,
  "height": 1920,
@@ -286,7 +286,6 @@
      "at": 0.55,
      "y": -60,
      "maxW": 640,
-     "tag": "Solicitud",
      "from": "me",
      "dim": [
       [
@@ -325,7 +324,6 @@
      "at": 9.5,
      "y": 330,
      "maxW": 640,
-     "tag": "Seguimiento",
      "dim": [
       [
        9.5,
@@ -370,7 +368,6 @@
      "at": 13.6,
      "y": 960,
      "maxW": 560,
-     "tag": "Más adelante",
      "type": 0.95,
      "hl": "4 meses",
      "hlAt": 15.35,
@@ -512,27 +509,6 @@
   {
    "id": "l12",
    "type": "shape",
-   "name": "Dependía del desarrollador",
-   "start": 7.9,
-   "end": 9.35,
-   "x": 540,
-   "y": 1215,
-   "w": 640,
-   "h": 86,
-   "rot": 0,
-   "opacity": 1,
-   "animIn": "pop",
-   "animOut": "fade",
-   "animDur": 0.45,
-   "kind": "pill",
-   "color": "#0B0B0B",
-   "label": "Dependía del desarrollador",
-   "labelColor": "#F5F1E8",
-   "labelSize": 36
-  },
-  {
-   "id": "l13",
-   "type": "shape",
    "name": "Corte a negro",
    "start": 19.64,
    "end": 23.2,
@@ -549,7 +525,7 @@
    "color": "#0B0B0B"
   },
   {
-   "id": "l14",
+   "id": "l13",
    "type": "logo",
    "name": "Logo HR (sobre negro)",
    "start": 19.64,
@@ -566,7 +542,7 @@
    "variant": "light"
   },
   {
-   "id": "l15",
+   "id": "l14",
    "type": "shape",
    "name": "Flecha (sobre negro)",
    "start": 19.64,
@@ -584,7 +560,7 @@
    "color": "#F5F1E8"
   },
   {
-   "id": "l16",
+   "id": "l15",
    "type": "text",
    "name": "Monto",
    "start": 19.92,
@@ -616,28 +592,7 @@
    ]
   },
   {
-   "id": "l17",
-   "type": "shape",
-   "name": "Atribución monto",
-   "start": 20.45,
-   "end": 22.75,
-   "x": 540,
-   "y": 1015,
-   "w": 560,
-   "h": 76,
-   "rot": 0,
-   "opacity": 1,
-   "animIn": "pop",
-   "animOut": "fade",
-   "animDur": 0.3,
-   "kind": "pill",
-   "color": "#F5F1E8",
-   "label": "Según relato del cliente",
-   "labelColor": "#0B0B0B",
-   "labelSize": 34
-  },
-  {
-   "id": "l18",
+   "id": "l16",
    "type": "text",
    "name": "Aclaración monto",
    "start": 20.75,
@@ -659,7 +614,7 @@
    "align": "center"
   },
   {
-   "id": "l19",
+   "id": "l17",
    "type": "shape",
    "name": "Foto junto al monto",
    "start": 21.74,
@@ -690,7 +645,7 @@
    ]
   },
   {
-   "id": "l20",
+   "id": "l18",
    "type": "shape",
    "name": "Halo 7",
    "start": 23.0,
@@ -708,7 +663,7 @@
    "color": "#6EC6FF"
   },
   {
-   "id": "l21",
+   "id": "l19",
    "type": "mockup",
    "name": "Navegador · editar sin depender",
    "start": 22.95,
@@ -764,7 +719,7 @@
    ]
   },
   {
-   "id": "l22",
+   "id": "l20",
    "type": "text",
    "name": "Título · Poder hacer cambios",
    "start": 23.5,
@@ -787,7 +742,7 @@
    "accent": "#0B0B0B"
   },
   {
-   "id": "l23",
+   "id": "l21",
    "type": "text",
    "name": "Título · Sin depender",
    "start": 25.55,
@@ -810,7 +765,7 @@
    "accent": "#0B0B0B"
   },
   {
-   "id": "l24",
+   "id": "l22",
    "type": "shape",
    "name": "Halo 8",
    "start": 27.7,
@@ -828,7 +783,7 @@
    "color": "#6EC6FF"
   },
   {
-   "id": "l25",
+   "id": "l23",
    "type": "shape",
    "name": "Ficha Dominio",
    "start": 28.25,
@@ -848,12 +803,12 @@
    "shadow": true
   },
   {
-   "id": "l26",
+   "id": "l24",
    "type": "text",
    "name": "Ficha Dominio · título",
    "start": 28.35,
    "end": 31.35,
-   "x": 330,
+   "x": 400,
    "y": 690,
    "w": 440,
    "h": 90,
@@ -869,14 +824,14 @@
    "align": "left"
   },
   {
-   "id": "l27",
+   "id": "l25",
    "type": "text",
    "name": "Ficha Dominio · detalle",
    "start": 28.4,
    "end": 31.35,
-   "x": 340,
+   "x": 400,
    "y": 760,
-   "w": 460,
+   "w": 440,
    "h": 50,
    "rot": 0,
    "opacity": 1,
@@ -891,7 +846,7 @@
    "align": "left"
   },
   {
-   "id": "l28",
+   "id": "l26",
    "type": "shape",
    "name": "Ficha Dominio · a tu nombre",
    "start": 30.25,
@@ -914,7 +869,7 @@
    "shadow": true
   },
   {
-   "id": "l29",
+   "id": "l27",
    "type": "shape",
    "name": "Ficha Hosting",
    "start": 29.0,
@@ -934,12 +889,12 @@
    "shadow": true
   },
   {
-   "id": "l30",
+   "id": "l28",
    "type": "text",
    "name": "Ficha Hosting · título",
    "start": 29.1,
    "end": 31.35,
-   "x": 330,
+   "x": 400,
    "y": 950,
    "w": 440,
    "h": 90,
@@ -955,14 +910,14 @@
    "align": "left"
   },
   {
-   "id": "l31",
+   "id": "l29",
    "type": "text",
    "name": "Ficha Hosting · detalle",
    "start": 29.15,
    "end": 31.35,
-   "x": 340,
+   "x": 400,
    "y": 1020,
-   "w": 460,
+   "w": 440,
    "h": 50,
    "rot": 0,
    "opacity": 1,
@@ -977,7 +932,7 @@
    "align": "left"
   },
   {
-   "id": "l32",
+   "id": "l30",
    "type": "shape",
    "name": "Ficha Hosting · a tu nombre",
    "start": 30.5,
@@ -1000,7 +955,7 @@
    "shadow": true
   },
   {
-   "id": "l33",
+   "id": "l31",
    "type": "shape",
    "name": "Halo 9",
    "start": 31.3,
@@ -1018,7 +973,7 @@
    "color": "#6EC6FF"
   },
   {
-   "id": "l34",
+   "id": "l32",
    "type": "shape",
    "name": "Etiqueta ejemplo",
    "start": 31.5,
@@ -1039,7 +994,7 @@
    "labelSize": 32
   },
   {
-   "id": "l35",
+   "id": "l33",
    "type": "text",
    "name": "Título · Tú administras",
    "start": 31.45,
@@ -1062,7 +1017,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l36",
+   "id": "l34",
    "type": "text",
    "name": "Título · Te enseño a editarla",
    "start": 32.7,
@@ -1085,7 +1040,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l37",
+   "id": "l35",
    "type": "mockup",
    "name": "Navegador · editando",
    "start": 31.3,
@@ -1182,7 +1137,7 @@
    ]
   },
   {
-   "id": "l38",
+   "id": "l36",
    "type": "text",
    "name": "Título · Prefieres delegar",
    "start": 34.35,
@@ -1205,7 +1160,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l39",
+   "id": "l37",
    "type": "text",
    "name": "Título · Planes de mantención",
    "start": 35.55,
@@ -1228,7 +1183,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l40",
+   "id": "l38",
    "type": "shape",
    "name": "Píldora acompañamiento",
    "start": 35.0,
@@ -1250,7 +1205,7 @@
    "hitAt": 35.55
   },
   {
-   "id": "l41",
+   "id": "l39",
    "type": "shape",
    "name": "Halo cierre",
    "start": 37.0,
@@ -1268,7 +1223,7 @@
    "color": "#FF6BA7"
   },
   {
-   "id": "l42",
+   "id": "l40",
    "type": "text",
    "name": "Título · Creamos la tuya",
    "start": 37.0,
@@ -1291,7 +1246,7 @@
    "accent": "#FF6BA7"
   },
   {
-   "id": "l43",
+   "id": "l41",
    "type": "text",
    "name": "Firma",
    "start": 37.15,
@@ -1313,7 +1268,7 @@
    "align": "center"
   },
   {
-   "id": "l44",
+   "id": "l42",
    "type": "shape",
    "name": "Botón WhatsApp",
    "start": 37.2,
@@ -1338,7 +1293,7 @@
    "shadow": true
   },
   {
-   "id": "l45",
+   "id": "l43",
    "type": "caption",
    "name": "Subtítulos 1",
    "start": 0.0,
@@ -1356,10 +1311,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l46",
+   "id": "l44",
    "type": "caption",
    "name": "Subtítulos 2",
    "start": 2.93,
@@ -1377,10 +1333,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l47",
+   "id": "l45",
    "type": "caption",
    "name": "Subtítulos 3",
    "start": 4.15,
@@ -1398,10 +1355,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l48",
+   "id": "l46",
    "type": "caption",
    "name": "Subtítulos 4",
    "start": 5.54,
@@ -1419,10 +1377,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l49",
+   "id": "l47",
    "type": "caption",
    "name": "Subtítulos 5",
    "start": 7.41,
@@ -1440,10 +1399,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l50",
+   "id": "l48",
    "type": "caption",
    "name": "Subtítulos 6",
    "start": 9.49,
@@ -1461,10 +1421,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l51",
+   "id": "l49",
    "type": "caption",
    "name": "Subtítulos 7",
    "start": 11.01,
@@ -1482,10 +1443,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l52",
+   "id": "l50",
    "type": "caption",
    "name": "Subtítulos 8",
    "start": 12.84,
@@ -1503,10 +1465,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l53",
+   "id": "l51",
    "type": "caption",
    "name": "Subtítulos 9",
    "start": 14.13,
@@ -1524,10 +1487,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l54",
+   "id": "l52",
    "type": "caption",
    "name": "Subtítulos 10",
    "start": 16.39,
@@ -1545,10 +1509,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l55",
+   "id": "l53",
    "type": "caption",
    "name": "Subtítulos 11",
    "start": 19.69,
@@ -1566,10 +1531,11 @@
    "size": 54,
    "capStyle": "plain-light",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l56",
+   "id": "l54",
    "type": "caption",
    "name": "Subtítulos 12",
    "start": 21.74,
@@ -1587,10 +1553,11 @@
    "size": 54,
    "capStyle": "plain-light",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l57",
+   "id": "l55",
    "type": "caption",
    "name": "Subtítulos 13",
    "start": 23.45,
@@ -1608,10 +1575,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l58",
+   "id": "l56",
    "type": "caption",
    "name": "Subtítulos 14",
    "start": 25.28,
@@ -1629,10 +1597,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l59",
+   "id": "l57",
    "type": "caption",
    "name": "Subtítulos 15",
    "start": 27.77,
@@ -1650,10 +1619,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l60",
+   "id": "l58",
    "type": "caption",
    "name": "Subtítulos 16",
    "start": 29.55,
@@ -1671,10 +1641,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l61",
+   "id": "l59",
    "type": "caption",
    "name": "Subtítulos 17",
    "start": 31.39,
@@ -1692,10 +1663,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l62",
+   "id": "l60",
    "type": "caption",
    "name": "Subtítulos 18",
    "start": 32.64,
@@ -1713,10 +1685,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l63",
+   "id": "l61",
    "type": "caption",
    "name": "Subtítulos 19",
    "start": 34.29,
@@ -1734,10 +1707,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l64",
+   "id": "l62",
    "type": "caption",
    "name": "Subtítulos 20",
    "start": 35.51,
@@ -1755,10 +1729,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l65",
+   "id": "l63",
    "type": "caption",
    "name": "Subtítulos 21",
    "start": 37.1,
@@ -1776,10 +1751,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l66",
+   "id": "l64",
    "type": "caption",
    "name": "Subtítulos 22",
    "start": 38.25,
@@ -1797,10 +1773,11 @@
    "size": 54,
    "capStyle": "pill",
    "maxWords": 9,
+   "capAlign": "center",
    "accent": "#FFFFFF"
   },
   {
-   "id": "l67",
+   "id": "l65",
    "type": "sound",
    "name": "Pop foto",
    "start": 0.05,
@@ -1818,7 +1795,7 @@
    "volume": 0.14
   },
   {
-   "id": "l68",
+   "id": "l66",
    "type": "sound",
    "name": "Tecleo 1",
    "start": 0.85,
@@ -1836,7 +1813,7 @@
    "volume": 0.1
   },
   {
-   "id": "l69",
+   "id": "l67",
    "type": "sound",
    "name": "Tecleo 2",
    "start": 9.8,
@@ -1854,7 +1831,7 @@
    "volume": 0.1
   },
   {
-   "id": "l70",
+   "id": "l68",
    "type": "sound",
    "name": "Tecleo 3",
    "start": 13.9,
@@ -1872,7 +1849,7 @@
    "volume": 0.1
   },
   {
-   "id": "l71",
+   "id": "l69",
    "type": "sound",
    "name": "Tecleo 4",
    "start": 16.8,
@@ -1890,7 +1867,7 @@
    "volume": 0.1
   },
   {
-   "id": "l72",
+   "id": "l70",
    "type": "sound",
    "name": "Whoosh atribución",
    "start": 2.92,
@@ -1908,7 +1885,7 @@
    "volume": 0.1
   },
   {
-   "id": "l73",
+   "id": "l71",
    "type": "sound",
    "name": "Pop panel",
    "start": 4.2,
@@ -1926,7 +1903,7 @@
    "volume": 0.12
   },
   {
-   "id": "l74",
+   "id": "l72",
    "type": "sound",
    "name": "Clic panel",
    "start": 6.35,
@@ -1944,7 +1921,7 @@
    "volume": 0.25
   },
   {
-   "id": "l75",
+   "id": "l73",
    "type": "sound",
    "name": "Whoosh vuelve chat",
    "start": 7.45,
@@ -1962,7 +1939,7 @@
    "volume": 0.12
   },
   {
-   "id": "l76",
+   "id": "l74",
    "type": "sound",
    "name": "Pop seguimiento",
    "start": 9.5,
@@ -1980,7 +1957,7 @@
    "volume": 0.12
   },
   {
-   "id": "l77",
+   "id": "l75",
    "type": "sound",
    "name": "Pop respuesta",
    "start": 13.6,
@@ -1998,7 +1975,7 @@
    "volume": 0.14
   },
   {
-   "id": "l78",
+   "id": "l76",
    "type": "sound",
    "name": "Golpe 4 meses",
    "start": 15.4,
@@ -2016,7 +1993,7 @@
    "volume": 0.16
   },
   {
-   "id": "l79",
+   "id": "l77",
    "type": "sound",
    "name": "Golpe millón",
    "start": 19.9,
@@ -2034,7 +2011,7 @@
    "volume": 0.22
   },
   {
-   "id": "l80",
+   "id": "l78",
    "type": "sound",
    "name": "Whoosh vuelve marfil",
    "start": 22.95,
@@ -2052,7 +2029,7 @@
    "volume": 0.1
   },
   {
-   "id": "l81",
+   "id": "l79",
    "type": "sound",
    "name": "Whoosh cambios",
    "start": 25.5,
@@ -2070,7 +2047,7 @@
    "volume": 0.08
   },
   {
-   "id": "l82",
+   "id": "l80",
    "type": "sound",
    "name": "Pop dominio",
    "start": 28.25,
@@ -2088,7 +2065,7 @@
    "volume": 0.12
   },
   {
-   "id": "l83",
+   "id": "l81",
    "type": "sound",
    "name": "Pop hosting",
    "start": 29.0,
@@ -2106,7 +2083,7 @@
    "volume": 0.12
   },
   {
-   "id": "l84",
+   "id": "l82",
    "type": "sound",
    "name": "Tick a tu nombre 1",
    "start": 30.25,
@@ -2124,7 +2101,7 @@
    "volume": 0.16
   },
   {
-   "id": "l85",
+   "id": "l83",
    "type": "sound",
    "name": "Tick a tu nombre 2",
    "start": 30.5,
@@ -2142,7 +2119,7 @@
    "volume": 0.16
   },
   {
-   "id": "l86",
+   "id": "l84",
    "type": "sound",
    "name": "Whoosh edición",
    "start": 31.3,
@@ -2160,7 +2137,7 @@
    "volume": 0.1
   },
   {
-   "id": "l87",
+   "id": "l85",
    "type": "sound",
    "name": "Clic cambiar imagen",
    "start": 32.95,
@@ -2178,7 +2155,7 @@
    "volume": 0.25
   },
   {
-   "id": "l88",
+   "id": "l86",
    "type": "sound",
    "name": "Confirmación",
    "start": 33.45,
@@ -2196,7 +2173,7 @@
    "volume": 0.12
   },
   {
-   "id": "l89",
+   "id": "l87",
    "type": "sound",
    "name": "Se aleja el navegador",
    "start": 34.45,
@@ -2214,7 +2191,7 @@
    "volume": 0.12
   },
   {
-   "id": "l90",
+   "id": "l88",
    "type": "sound",
    "name": "Pop acompañamiento",
    "start": 35.0,
@@ -2232,7 +2209,7 @@
    "volume": 0.12
   },
   {
-   "id": "l91",
+   "id": "l89",
    "type": "sound",
    "name": "Pop botón",
    "start": 37.2,
@@ -2250,7 +2227,7 @@
    "volume": 0.12
   },
   {
-   "id": "l92",
+   "id": "l90",
    "type": "sound",
    "name": "Campanita botón",
    "start": 38.3,
@@ -2268,7 +2245,7 @@
    "volume": 0.14
   },
   {
-   "id": "l93",
+   "id": "l91",
    "type": "sound",
    "name": "Música A",
    "start": 0,
@@ -2288,7 +2265,7 @@
    "fadeOut": 2.2
   },
   {
-   "id": "l94",
+   "id": "l92",
    "type": "sound",
    "name": "Música B (regresa tras el silencio)",
    "start": 22.3,
