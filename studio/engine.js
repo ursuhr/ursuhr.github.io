@@ -7,6 +7,8 @@ export const BRAND = {
 export const FONTS = {
   title: '"Archivo Black", "Arial Black", Arial, sans-serif',
   body: '"Lato", Arial, sans-serif',
+  anton: '"Anton", "Arial Narrow", Arial, sans-serif',      // reel de Neko Ramen: títulos
+  raleway: '"Raleway", Arial, sans-serif',                  // reel de Neko Ramen: subtítulos y textos secundarios
 };
 
 // Medios importados por el usuario: nombre -> { kind: 'image' | 'video', el, name, duration }
@@ -75,6 +77,8 @@ function parseTokens(text) {
 }
 
 function fontFor(l, size) {
+  if (l.font === 'anton') return `400 ${size}px ${FONTS.anton}`;
+  if (l.font === 'raleway') return `${l.weight || 600} ${size}px ${FONTS.raleway}`;
   const body = l.font === 'body';
   return `${body ? (l.bold ? '700' : '400') : '400'} ${size}px ${body ? FONTS.body : FONTS.title}`;
 }
@@ -83,7 +87,7 @@ function layoutText(ctx, l) {
   const size = l.size || 60;
   ctx.font = fontFor(l, size);
   ctx.letterSpacing = `${(l.tracking || 0) * size}px`;
-  const caps = l.caps ?? (l.font !== 'body');
+  const caps = l.caps ?? (l.font !== 'body' && l.font !== 'raleway');
   const toks = parseTokens(caps ? (l.text || '').toUpperCase() : (l.text || ''));
   const space = ctx.measureText(' ').width;
   const lines = [];
@@ -163,6 +167,13 @@ function squigglePoints(l, n = 80) {
 function drawShape(ctx, l, t, st) {
   const color = l.color || BRAND.coral;
   switch (l.kind) {
+    case 'scrim': {   // degradado vertical para dar lectura al texto sobre video claro; dir 'down' = más opaco abajo, 'up' = arriba
+      const up = l.dir === 'up', a = l.alpha ?? 0.5;
+      const g = ctx.createLinearGradient(0, -l.h / 2, 0, l.h / 2);
+      g.addColorStop(0, rgba(color, up ? a : 0)); g.addColorStop(1, rgba(color, up ? 0 : a));
+      ctx.fillStyle = g; ctx.fillRect(-l.w / 2, -l.h / 2, l.w, l.h);
+      break;
+    }
     case 'halo': {
       const r = l.w / 2;
       ctx.save();

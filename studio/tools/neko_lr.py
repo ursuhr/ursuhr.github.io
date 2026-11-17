@@ -17,6 +17,9 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 VALORES = os.path.join(HERE, 'neko_lr_valores.json')
 LUMA = np.array([0.2126, 0.7152, 0.0722], np.float32)
+# IMG_4716 es video HDR del iPhone (HLG / BT.2020 / Dolby Vision 8.4): hay que pasarlo a SDR con tone mapping antes de corregir.
+# Sin esto sale pálido y verdoso. Los demás clips ya son SDR BT.709.
+HLG_A_SDR = "zscale=t=linear:npl=400,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p"
 # centros de banda HSL (grados) y semiancho de cada una
 BANDAS = {'rojo': (0, 30), 'naranja': (30, 30), 'amarillo': (60, 30), 'verde': (120, 40), 'aqua': (180, 40), 'azul': (240, 40), 'morado': (275, 35), 'magenta': (320, 35)}
 

@@ -22,6 +22,8 @@ ap.add_argument('--music', required=True)
 ap.add_argument('--out', required=True)
 ap.add_argument('--version', choices=['A', 'B'], default='B', help='A con la foto cenital, B pasa directo de la preparación a los palillos')
 ap.add_argument('--name', default='neko-base')
+ap.add_argument('--zoom', type=float, default=1.10, help='encuadre más cerrado del ramen final (1 = sin zoom)')
+ap.add_argument('--zx', type=float, default=0.40); ap.add_argument('--zy', type=float, default=0.75)
 ap.add_argument('--no-machine-audio', action='store_true', help='mezcla solo música + palillos')
 a = ap.parse_args()
 os.makedirs(a.out, exist_ok=True)
@@ -31,12 +33,12 @@ FPS = 30
 # ---- tiempos de salida (s) ----
 # Segmentos y fuente: (archivo, desde, duración). El gancho (A) junta el crecimiento de la cortina de fideos
 # con el barrido de corte del mismo video, que hace de transición hacia la preparación.
-A1 = (f('8186'), 0.00, 1.80); A2 = (f('8186'), 5.10, 1.30)       # 3,1 s
+A1 = (f('8186'), 0.00, 2.20); A2 = (f('8186'), 5.55, 0.85)       # 3,05 s: crecimiento + barrido de corte
 B = (f('8181'), 8.30, 3.00)
 C = (f('8182'), 2.40, 1.70)
 D = (f('8184'), 2.90, 1.70)
 E_DUR = 2.10 if a.version == 'A' else 0.0
-F = (a.sticks, 0.00, 4.90)
+F = (a.sticks, 0.00, 4.50)               # termina en el segundo 4,5 del clip, sin congelar el fotograma
 XF_AB, XF_EF = 0.2, 0.3
 A_DUR = A1[2] + A2[2]
 P_DUR = B[2] + C[2] + D[2] + E_DUR
@@ -48,6 +50,10 @@ TOTAL = round(T_END_P + F[2] - XF_EF, 2)
 up = f'scale=-2:1920:flags=lanczos,crop=1080:1920,fps={FPS},setsar=1'
 
 LUTS = neko_lr.luts(os.path.join(a.out, 'luts'))   # corrección tipo Lightroom por clip (neko_lr_valores.json)
+def seg_zoom(idx, ss, dur, key):
+    zh = int(round(1920 * a.zoom / 2) * 2); zw = int(round(1080 * a.zoom / 2) * 2)
+    x = int((zw - 1080) * a.zx); y = int((zh - 1920) * a.zy)
+    return f"[{idx}:v]trim=start={ss}:duration={dur},setpts=PTS-STARTPTS,{neko_lr.HLG_A_SDR},scale={zw}:{zh}:flags=lanczos,crop=1080:1920:{x}:{y},fps={FPS},setsar=1,lut3d=file={LUTS['ramen']}:interp=tetrahedral[v{idx}]"
 def seg(idx, src, ss, dur, key):
     return f"[{idx}:v]trim=start={ss}:duration={dur},setpts=PTS-STARTPTS,{up},lut3d=file={LUTS[key]}:interp=tetrahedral[v{idx}]"
 
@@ -62,18 +68,18 @@ fc = ';'.join([
     seg(0, *A1, '8186'), seg(1, *A2, '8186'),
     seg(2, *B, '8181'), seg(3, *C, '8182'), seg(5, *D, '8184'),
     *([photo] if a.version == 'A' else []),
-    seg(6, *F, 'ramen'),
+    seg_zoom(6, F[1], F[2], 'ramen'),
     "[v0][v1]concat=n=2:v=1:a=0,settb=1/30,fps=30[vA]",
     ("[v2][v3][v5][v4]concat=n=4" if a.version == 'A' else "[v2][v3][v5]concat=n=3") + ":v=1:a=0,settb=1/30,fps=30[vP]",
     f"[vA][vP]xfade=transition=fade:duration={XF_AB}:offset={A_DUR-XF_AB:.2f}[vAP]",
-    f"[vAP][v6]xfade=transition=fade:duration={XF_EF}:offset={T_EF:.2f},settb=1/30,format=yuv420p[vout]",
+    f"[vAP][v6]xfade=transition=fade:duration={XF_EF}:offset={T_EF:.2f},settb=1/30,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p[vout]",
 ])
 # entradas: 0 y 1 = 8186 (dos tramos), 2 = 8181, 3 = 8182, 4 = foto, 5 = 8184, 6 = palillos
 inputs = [A1[0], A2[0], B[0], C[0], None, D[0], F[0]]
 cmd = ['ffmpeg', '-v', 'error', '-y']
 for i, p in enumerate(inputs):
     cmd += (['-loop', '1', '-framerate', str(FPS), '-t', str((E_DUR or 2.1) + 0.5), '-i', a.photo] if p is None else ['-i', p])
-cmd += ['-filter_complex', fc, '-map', '[vout]', '-an', '-t', str(TOTAL), '-c:v', 'libx264', '-crf', '14', '-preset', 'slow', '-pix_fmt', 'yuv420p',
+cmd += ['-filter_complex', fc, '-map', '[vout]', '-an', '-t', str(TOTAL), '-c:v', 'libx264', '-crf', '14', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
         os.path.join(a.out, a.name + '.mp4')]
 print('video…'); subprocess.check_call(cmd)
 
@@ -82,7 +88,7 @@ print('video…'); subprocess.check_call(cmd)
 parts, labels = [], []
 ai = ['-i', a.music, '-i', F[0]]
 parts.append(f"[0:a]atrim=0:{TOTAL},asetpts=PTS-STARTPTS,volume=0.55,afade=t=in:d=1.2,afade=t=out:st={TOTAL-1.8:.2f}:d=1.8[mus]"); labels.append('[mus]')
-parts.append(f"[1:a]atrim=0:{F[2]},asetpts=PTS-STARTPTS,highpass=f=80,volume=1.0,afade=t=in:d=0.25,afade=t=out:st={F[2]-0.6:.2f}:d=0.6,adelay={int(T_EF*1000)}|{int(T_EF*1000)}[stk]"); labels.append('[stk]')
+parts.append(f"[1:a]atrim=0:{F[2]},asetpts=PTS-STARTPTS,highpass=f=80,volume=1.0,afade=t=in:d=0.25,afade=t=out:st={F[2]-0.5:.2f}:d=0.5,adelay={int(T_EF*1000)}|{int(T_EF*1000)}[stk]"); labels.append('[stk]')
 if not a.no_machine_audio:
     ai += ['-i', A1[0]]
     parts.append(f"[2:a]atrim=start={A1[1]}:duration={A1[2]},asetpts=PTS-STARTPTS,highpass=f=120,lowpass=f=6000,volume=0.5,afade=t=in:d=0.15[m1]")
@@ -92,4 +98,8 @@ parts.append(f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0:duration=l
 cmd = ['ffmpeg', '-v', 'error', '-y'] + ai + ['-filter_complex', ';'.join(parts), '-map', '[aout]', '-ar', '48000', '-ac', '2', '-c:a', 'aac', '-b:a', '192k',
        os.path.join(a.out, a.name + '-audio.m4a')]
 print('audio…'); subprocess.check_call(cmd)
+subprocess.check_call(['ffmpeg', '-v', 'error', '-y', '-i', os.path.join(a.out, a.name + '-audio.m4a'), '-c:a', 'pcm_s16le', os.path.join(a.out, a.name + '-audio.wav')])
+import json
+tiempos = dict(total=TOTAL, A_fin=round(T_AB + XF_AB, 2), B=round(T_AB, 2), C=round(T_AB + B[2], 2), D=round(T_AB + B[2] + C[2], 2), palillos=round(T_EF, 2), palillos_pleno=round(T_EF + XF_EF, 2), foto=a.version == 'A')
+json.dump(tiempos, open(os.path.join(a.out, a.name + '-tiempos.json'), 'w'), indent=1)
 print(f'listo · {TOTAL} s · inicio de cada bloque: B {T_AB:.1f}  C {T_AB+B[2]:.1f}  D {T_AB+B[2]+C[2]:.1f}  foto {T_AB+B[2]+C[2]+D[2]:.1f}  palillos {T_EF:.1f}')

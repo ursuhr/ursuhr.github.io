@@ -45,7 +45,7 @@
       "iluminaciones": -22,
       "sombras": 2,
       "blancos": 0,
-      "negros": -18,
+      "negros": -14,
       "temperatura": 1,
       "intensidad": 3,
       "saturacion": -3,
@@ -74,25 +74,16 @@
       }
     },
     "ramen": {
-      "exposicion": -0.05,
-      "contraste": 16,
-      "iluminaciones": -10,
-      "sombras": 2,
-      "blancos": -6,
-      "negros": -14,
-      "temperatura": 1,
-      "intensidad": 10,
-      "saturacion": 3,
-      "hsl": {
-        "naranja": {
-          "sat": 4,
-          "lum": -4
-        },
-        "amarillo": {
-          "sat": -8,
-          "lum": -6
-        }
-      }
+      "exposicion": 0.0,
+      "contraste": 0,
+      "iluminaciones": 0,
+      "sombras": 0,
+      "blancos": 0,
+      "negros": 0,
+      "temperatura": 0,
+      "intensidad": 0,
+      "saturacion": 0,
+      "hsl": {}
     },
     "ramen_suave": {
       "exposicion": -0.03,
@@ -112,6 +103,27 @@
         "amarillo": {
           "sat": -8,
           "lum": -5
+        }
+      }
+    },
+    "ramen_valores_anteriores": {
+      "exposicion": -0.05,
+      "contraste": 16,
+      "iluminaciones": -10,
+      "sombras": 2,
+      "blancos": -6,
+      "negros": -14,
+      "temperatura": 1,
+      "intensidad": 10,
+      "saturacion": 3,
+      "hsl": {
+        "naranja": {
+          "sat": 4,
+          "lum": -4
+        },
+        "amarillo": {
+          "sat": -8,
+          "lum": -6
         }
       }
     }

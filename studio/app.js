@@ -56,6 +56,7 @@ function toast(msg) {
 }
 const fontsReady = () => Promise.all([
   document.fonts.load('48px "Archivo Black"'), document.fonts.load('700 40px Lato'), document.fonts.load('400 40px Lato'),
+  document.fonts.load('48px Anton'), document.fonts.load('500 40px Raleway'), document.fonts.load('600 40px Raleway'), document.fonts.load('700 40px Raleway'),
 ]);
 
 // ---------- proyecto, historial y guardado ----------
@@ -779,6 +780,7 @@ $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
   ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
   ['Reel: Un millón por cambiar una foto', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('millon-foto')],
   ['Reel: Los $200.000 por las claves (historia)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('clienta-200k')],
+  ['Reel: Neko Ramen · fideos hechos en casa', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('neko-fideos')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
   ['Borrar archivos guardados', async () => { if (confirm('Se borran las grabaciones, sonidos y la voz guardados en este navegador. ¿Continuar?')) { await clearFiles(); toast('Listo. Recarga la página para empezar limpio.'); } }],
 ]);

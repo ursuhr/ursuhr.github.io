@@ -14,7 +14,7 @@ for r, (key, nom) in enumerate([('ramen', 'corrección actual'), ('ramen_suave',
     for i, t in enumerate(a.t):
         out = os.path.join(tmp, f'{key}{i}.png')
         subprocess.check_call(['ffmpeg', '-v', 'error', '-y', '-ss', str(t), '-i', a.sticks, '-frames:v', '1', '-vf',
-                               f'scale=-2:{H}:flags=lanczos,crop={W}:{H},lut3d=file={luts[key]}:interp=tetrahedral', out])
+                               neko_lr.HLG_A_SDR + f',scale=-2:{H}:flags=lanczos,crop={W}:{H},lut3d=file={luts[key]}:interp=tetrahedral', out])
         x = pad + i * (W + pad); y = pad + r * (H + 20 + pad)
         dr.text((x, y), f'fotograma {i+1} · {t:.1f} s · {nom}', fill=(11, 11, 11)); sheet.paste(Image.open(out).convert('RGB'), (x, y + 16))
 sheet.save(a.out); print(a.out, sheet.size)

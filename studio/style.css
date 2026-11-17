@@ -1,6 +1,10 @@
 @font-face { font-family: "Archivo Black"; font-weight: 400; font-display: swap; src: url(fonts/archivo-black-latin-400-normal.woff2) format("woff2"); }
 @font-face { font-family: "Lato"; font-weight: 400; font-display: swap; src: url(fonts/lato-latin-400-normal.woff2) format("woff2"); }
 @font-face { font-family: "Lato"; font-weight: 700; font-display: swap; src: url(fonts/lato-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Anton"; font-weight: 400; font-display: swap; src: url(fonts/anton-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Raleway"; font-weight: 500; font-display: swap; src: url(fonts/raleway-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Raleway"; font-weight: 600; font-display: swap; src: url(fonts/raleway-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Raleway"; font-weight: 700; font-display: swap; src: url(fonts/raleway-latin-700-normal.woff2) format("woff2"); }
 
 :root {
   --ivory: #F5F1E8; --black: #0B0B0B; --coral: #FF6BA7; --sun: #FFD357; --green: #34D399; --sky: #6EC6FF;

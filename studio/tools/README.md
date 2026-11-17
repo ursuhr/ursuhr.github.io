@@ -22,3 +22,11 @@ Studio es el editor de reels de Úrsula HR (`/studio`, `noindex`). Es 100 % nave
 - Honestidad: no redondear ni inventar datos, anonimizar clientes y desarrolladores, rotular lo recreado.
 - No usar `git merge -X ours` si hay otra sesión trabajando: puede pisar cambios del editor. Cambiar `engine.js`/`app.js` solo si hace falta y correr `regr.js` antes.
 - Audio de las voces: no se publica en el repositorio.
+
+## Reel de Neko Ramen (fideos hechos en casa)
+Es material de un cliente: los videos y fotos NO se suben al repositorio (público). Flujo:
+1. `make_neko_base.py` arma el montaje base 1080x1920 (cortes, corrección de color, zoom del ramen) y la mezcla de audio en una carpeta fuera del repo.
+2. `neko_lr.py` + `neko_lr_valores.json`: corrección tipo Lightroom por clip (LUT 3D). Los valores se editan uno por uno. `neko_hoja.py` y `neko_ramen_frames.py` sacan hojas comparativas sin renderizar el reel.
+3. IMG_4716 es HDR del iPhone (HLG, BT.2020): se convierte a SDR con tone mapping (`HLG_A_SDR`) antes de corregir. Sin eso sale pálido.
+4. `make_neko_fideos.py` genera la plantilla (`projects/neko-fideos.json`) con los textos (Anton y Raleway). En Studio se importan `neko-B.mp4` (medios) y `neko-B-audio.wav` (botón de audio). `neko_render.js` renderiza fotogramas y exporta con Playwright.
+5. `make_neko_portada.py` arma la portada con la foto cenital real.

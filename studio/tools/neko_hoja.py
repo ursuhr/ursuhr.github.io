@@ -20,7 +20,9 @@ cols = [('IMG_8186 · máquina', v('8186'), 1.2, '8186'), ('IMG_8181 · preparac
         ('IMG_8184 · preparación', v('8184'), 3.6, '8184'), ('Ramen terminado', a.sticks, 2.2, 'ramen')]
 if a.only: cols = [c for c in cols if c[3] in a.only]
 tmp = tempfile.mkdtemp(); luts = neko_lr.luts(tmp); d = neko_lr.cargar()
+HDR = lambda src: neko_lr.HLG_A_SDR + ',' if src == a.sticks else ''
 def fr(src, t, vf, n):
+    vf = HDR(src) + vf
     out = os.path.join(tmp, n + '.png')
     subprocess.check_call(['ffmpeg', '-v', 'error', '-y', '-ss', str(t), '-i', src, '-frames:v', '1', '-vf', vf, out]); return Image.open(out).convert('RGB')
 pad, tl = 10, 12 * 12 + 30
