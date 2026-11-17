@@ -305,9 +305,12 @@ function placeholder(ctx, x, y, w, h, label) {
 }
 
 function drawImageLayer(ctx, l0, t = 0) {
-  // zoomKf [[t, zoom, fx, fy]]: zoom lento dentro del marco (la capa no cambia de tamaño)
-  const zk = l0.zoomKf ? kfValue(l0.zoomKf, t, [l0.zoom || 1, l0.fx ?? 0.5, l0.fy ?? 0.5]) : null;
-  const l = zk ? { ...l0, zoom: zk[0], fx: zk[1], fy: zk[2] } : l0;
+  // zoom lento: de zoom/fx/fy (al inicio de la capa) a zoomEnd/fxEnd/fyEnd (al final), sin cambiar el tamaño del marco
+  let l = l0;
+  if (l0.zoomEnd != null) {
+    const q = clamp((t - l0.start) / Math.max(0.01, l0.end - l0.start), 0, 1), e = q * q * (3 - 2 * q), mix = (a, b) => a + (b - a) * e;
+    l = { ...l0, zoom: mix(l0.zoom || 1, l0.zoomEnd), fx: mix(l0.fx ?? 0.5, l0.fxEnd ?? l0.fx ?? 0.5), fy: mix(l0.fy ?? 0.5, l0.fyEnd ?? l0.fy ?? 0.5) };
+  }
   const a = assets.get(l.asset);
   if (l.shadow) { ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 18; }
   ctx.save();

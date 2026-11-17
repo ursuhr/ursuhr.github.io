@@ -296,26 +296,18 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "asset": "IMG_5233.mp4",
+   "asset": "IMG_5233.mov",
    "trim": 0.0,
    "speed": 1.0,
    "radius": 36,
    "shadow": true,
    "fit": "cover",
-   "zoomKf": [
-    [
-     0.0,
-     1.2,
-     0.74,
-     0.75
-    ],
-    [
-     3.55,
-     1.32,
-     0.68,
-     0.72
-    ]
-   ]
+   "zoom": 1.2,
+   "fx": 0.74,
+   "fy": 0.75,
+   "zoomEnd": 1.32,
+   "fxEnd": 0.68,
+   "fyEnd": 0.72
   },
   {
    "id": "l12",
@@ -332,26 +324,18 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "asset": "IMG_5232.mp4",
+   "asset": "IMG_5232.mov",
    "trim": 3.5,
    "speed": 1.0,
    "radius": 36,
    "shadow": true,
    "fit": "cover",
-   "zoomKf": [
-    [
-     6.76,
-     1.2,
-     0.26,
-     0.75
-    ],
-    [
-     9.42,
-     1.38,
-     0.26,
-     0.7
-    ]
-   ]
+   "zoom": 1.2,
+   "fx": 0.26,
+   "fy": 0.75,
+   "zoomEnd": 1.38,
+   "fxEnd": 0.26,
+   "fyEnd": 0.7
   },
   {
    "id": "l13",
@@ -368,26 +352,18 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "asset": "IMG_5237.mp4",
+   "asset": "IMG_5237.mov",
    "trim": 0.0,
    "speed": 0.936,
    "radius": 36,
    "shadow": true,
    "fit": "cover",
-   "zoomKf": [
-    [
-     9.42,
-     1.3,
-     0.3,
-     0.08
-    ],
-    [
-     13.69,
-     1.45,
-     0.3,
-     0.08
-    ]
-   ]
+   "zoom": 1.3,
+   "fx": 0.3,
+   "fy": 0.08,
+   "zoomEnd": 1.45,
+   "fxEnd": 0.3,
+   "fyEnd": 0.08
   },
   {
    "id": "l14",
@@ -404,26 +380,18 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "asset": "IMG_5233.mp4",
+   "asset": "IMG_5233.mov",
    "trim": 2.5,
    "speed": 1.0,
    "radius": 36,
    "shadow": true,
    "fit": "cover",
-   "zoomKf": [
-    [
-     13.69,
-     1.2,
-     0.74,
-     0.75
-    ],
-    [
-     18.08,
-     1.38,
-     0.64,
-     0.72
-    ]
-   ]
+   "zoom": 1.2,
+   "fx": 0.74,
+   "fy": 0.75,
+   "zoomEnd": 1.38,
+   "fxEnd": 0.64,
+   "fyEnd": 0.72
   },
   {
    "id": "l15",
@@ -440,26 +408,18 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "asset": "IMG_5235.mp4",
+   "asset": "IMG_5235.mov",
    "trim": 0.0,
    "speed": 0.78,
    "radius": 36,
    "shadow": true,
    "fit": "cover",
-   "zoomKf": [
-    [
-     18.08,
-     1.2,
-     0.38,
-     0.59
-    ],
-    [
-     22.47,
-     1.38,
-     0.43,
-     0.56
-    ]
-   ]
+   "zoom": 1.2,
+   "fx": 0.38,
+   "fy": 0.59,
+   "zoomEnd": 1.38,
+   "fxEnd": 0.43,
+   "fyEnd": 0.56
   },
   {
    "id": "l16",
@@ -476,26 +436,18 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "asset": "IMG_5237.mp4",
+   "asset": "IMG_5237.mov",
    "trim": 4.5,
    "speed": 0.8,
    "radius": 36,
    "shadow": true,
    "fit": "cover",
-   "zoomKf": [
-    [
-     22.47,
-     1.3,
-     0.3,
-     0.08
-    ],
-    [
-     25.22,
-     1.45,
-     0.3,
-     0.08
-    ]
-   ]
+   "zoom": 1.3,
+   "fx": 0.3,
+   "fy": 0.08,
+   "zoomEnd": 1.45,
+   "fxEnd": 0.3,
+   "fyEnd": 0.08
   },
   {
    "id": "l17",

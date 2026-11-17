@@ -43,13 +43,13 @@ CARD=dict(x=540,y=1050,w=960,h=960)
 def clip(name,seg,asset,trim,speed,z0,z1,fx0,fx1,fy0,fy1):
     a,b=T[seg]
     L('image',name,a,b,CARD['x'],CARD['y'],CARD['w'],CARD['h'],asset=asset,trim=trim,speed=speed,radius=36,shadow=True,fit='cover',
-      zoomKf=[[a,z0,fx0,fy0],[b,z1,fx1,fy1]])
-clip('Clip · gancho','hook','IMG_5233.mp4',0.0,1.0,1.2,1.32,0.74,0.68,0.75,0.72)
-clip('Clip · tu marca','marca','IMG_5232.mp4',3.5,1.0,1.2,1.38,0.26,0.26,0.75,0.70)
-clip('Clip · investigo','invest','IMG_5237.mp4',0.0,0.936,1.3,1.45,0.3,0.3,0.08,0.08)
-clip('Clip · prototipo','proto','IMG_5233.mp4',2.5,1.0,1.2,1.38,0.74,0.64,0.75,0.72)
-clip('Clip · Elementor','elem','IMG_5235.mp4',0.0,0.78,1.2,1.38,0.38,0.43,0.59,0.56)
-clip('Clip · SEO','seo','IMG_5237.mp4',4.5,0.8,1.3,1.45,0.3,0.3,0.08,0.08)
+      zoom=z0,fx=fx0,fy=fy0,zoomEnd=z1,fxEnd=fx1,fyEnd=fy1)
+clip('Clip · gancho','hook','IMG_5233.mov',0.0,1.0,1.2,1.32,0.74,0.68,0.75,0.72)
+clip('Clip · tu marca','marca','IMG_5232.mov',3.5,1.0,1.2,1.38,0.26,0.26,0.75,0.70)
+clip('Clip · investigo','invest','IMG_5237.mov',0.0,0.936,1.3,1.45,0.3,0.3,0.08,0.08)
+clip('Clip · prototipo','proto','IMG_5233.mov',2.5,1.0,1.2,1.38,0.74,0.64,0.75,0.72)
+clip('Clip · Elementor','elem','IMG_5235.mov',0.0,0.78,1.2,1.38,0.38,0.43,0.59,0.56)
+clip('Clip · SEO','seo','IMG_5237.mov',4.5,0.8,1.3,1.45,0.3,0.3,0.08,0.08)
 
 # ---- textos de los pasos ----
 a,b=T['hook'];   title('Gancho',a+0.05,b,390,'Antes de construir tu web, te muestro cómo va a quedar',64,320,accent=BK)

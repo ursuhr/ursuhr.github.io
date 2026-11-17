@@ -358,6 +358,9 @@ const MEDIA_FIELDS = [
   F('zoom', 'Zoom', 'number', { step: 0.1, def: () => 1 }),
   F('fx', 'Enfoque X (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
   F('fy', 'Enfoque Y (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
+  F('zoomEnd', 'Zoom final (zoom lento)', 'number', { step: 0.1 }),
+  F('fxEnd', 'Enfoque X final', 'number', { step: 0.05 }),
+  F('fyEnd', 'Enfoque Y final', 'number', { step: 0.05 }),
   F('trim', 'Inicio del clip (s)', 'number', { step: 0.1 }), F('speed', 'Velocidad', 'number', { step: 0.1 }),
 ];
 const SCHEMA = {
