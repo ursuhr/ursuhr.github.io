@@ -12,7 +12,7 @@ Uso:
 """
 import argparse, os, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from neko_grade import GRADES
+import neko_lr
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--src', required=True, help='carpeta con IMG_8181/8182/8184/8186_720p.mp4')
@@ -20,7 +20,7 @@ ap.add_argument('--photo', required=True, help='fotografía cenital (jpg)')
 ap.add_argument('--sticks', required=True, help='video de los palillos levantando los fideos (IMG_4716)')
 ap.add_argument('--music', required=True)
 ap.add_argument('--out', required=True)
-ap.add_argument('--version', choices=['A', 'B'], default='A', help='A con la foto cenital, B pasa directo de la preparación a los palillos')
+ap.add_argument('--version', choices=['A', 'B'], default='B', help='A con la foto cenital, B pasa directo de la preparación a los palillos')
 ap.add_argument('--name', default='neko-base')
 ap.add_argument('--no-machine-audio', action='store_true', help='mezcla solo música + palillos')
 a = ap.parse_args()
@@ -47,21 +47,22 @@ TOTAL = round(T_END_P + F[2] - XF_EF, 2)
 
 up = f'scale=-2:1920:flags=lanczos,crop=1080:1920,fps={FPS},setsar=1'
 
+LUTS = neko_lr.luts(os.path.join(a.out, 'luts'))   # corrección tipo Lightroom por clip (neko_lr_valores.json)
 def seg(idx, src, ss, dur, key):
-    return f"[{idx}:v]trim=start={ss}:duration={dur},setpts=PTS-STARTPTS,{up},{GRADES[key]}[v{idx}]"
+    return f"[{idx}:v]trim=start={ss}:duration={dur},setpts=PTS-STARTPTS,{up},lut3d=file={LUTS[key]}:interp=tetrahedral[v{idx}]"
 
 # foto cenital: recorte 9:16 centrado en el bowl, zoom suave hacia los fideos del centro
 ZF = max(1, int((E_DUR or 2.1) * FPS))
 tx, ty = 593 * 2, 1010 * 2       # fideos, en coordenadas de la foto ya recortada y duplicada
 photo = (f"[4:v]crop=1125:2000:187:0,scale=2250:4000:flags=lanczos,"
          f"zoompan=z='1+0.5*(1-cos(PI*on/{ZF}))/2':x='clip({tx}-iw/zoom/2,0,iw-iw/zoom)':y='clip({ty}-ih/zoom/2,0,ih-ih/zoom)'"
-         f":d={ZF}:s=1080x1920:fps={FPS},setsar=1,{GRADES['photo']}[v4]")
+         f":d={ZF}:s=1080x1920:fps={FPS},setsar=1[v4]")
 
 fc = ';'.join([
     seg(0, *A1, '8186'), seg(1, *A2, '8186'),
     seg(2, *B, '8181'), seg(3, *C, '8182'), seg(5, *D, '8184'),
     *([photo] if a.version == 'A' else []),
-    seg(6, *F, '4716'),
+    seg(6, *F, 'ramen'),
     "[v0][v1]concat=n=2:v=1:a=0,settb=1/30,fps=30[vA]",
     ("[v2][v3][v5][v4]concat=n=4" if a.version == 'A' else "[v2][v3][v5]concat=n=3") + ":v=1:a=0,settb=1/30,fps=30[vP]",
     f"[vA][vP]xfade=transition=fade:duration={XF_AB}:offset={A_DUR-XF_AB:.2f}[vAP]",

@@ -1,0 +1,29 @@
+{
+  "_nota": "Controles equivalentes a Lightroom. Exposición en EV; el resto en escala conceptual -100 a +100. Cada clip se edita por separado. Sin viñeta, sin máscaras, sin luz localizada, sin glow, sin grano, sin presets y sin filtro cálido adicional.",
+  "clips": {
+    "8186":  {"exposicion": 0.00, "contraste": 8,  "iluminaciones": -20, "sombras": 0,  "blancos": 3, "negros": -10, "temperatura": 3, "intensidad": 4, "saturacion": -3,
+              "hsl": {"azul": {"sat": -25, "lum": -15}, "amarillo": {"sat": -5, "lum": 0}}},
+    "8181":  {"exposicion": 0.10, "contraste": 10, "iluminaciones": -20, "sombras": 10, "blancos": 4, "negros": -8,  "temperatura": 2, "intensidad": 4, "saturacion": 0,
+              "hsl": {"amarillo": {"sat": -10, "lum": 5}}},
+    "8182":  {"exposicion": 0.15, "contraste": 8,  "iluminaciones": -15, "sombras": 12, "blancos": 4, "negros": -6,  "temperatura": 3, "intensidad": 4, "saturacion": -2,
+              "hsl": {"amarillo": {"sat": -10, "lum": 5}}},
+    "8184":  {"exposicion": 0.15, "contraste": 8,  "iluminaciones": -15, "sombras": 12, "blancos": 4, "negros": -6,  "temperatura": 3, "intensidad": 4, "saturacion": -2,
+              "hsl": {"amarillo": {"sat": -10, "lum": 5}}},
+    "ramen": {"exposicion": 0.00, "contraste": 10, "iluminaciones": -25, "sombras": 10, "blancos": 0, "negros": -8,  "temperatura": 2, "intensidad": 8, "saturacion": 0,
+              "hsl": {"naranja": {"sat": -4, "lum": 6}, "amarillo": {"sat": -5, "lum": 0}}}
+  },
+  "calibracion": {
+    "_nota": "Constantes con las que este script traduce la escala -100..+100 a operaciones reales. Cambian el efecto de cada deslizador, no el valor de cada clip.",
+    "contraste_k": 0.9,
+    "iluminaciones_amp": 0.28,
+    "sombras_amp": 0.28,
+    "blancos_k": 0.0015,
+    "negros_k": 0.0015,
+    "temperatura_r": 0.0025,
+    "temperatura_b": 0.0035,
+    "intensidad_k": 1.0,
+    "hsl_sat": 1.0,
+    "hsl_lum": 0.8
+  },
+  "efectos": {"vineta": 0, "mascaras_spotlight": false, "luz_localizada": false, "glow": 0, "grano": 0, "presets": "ninguno", "filtro_calido_adicional": false}
+}
