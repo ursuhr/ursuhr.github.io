@@ -304,7 +304,10 @@ function placeholder(ctx, x, y, w, h, label) {
   ctx.fillText(label || 'Aquí va tu grabación', x + w / 2, y + h / 2);
 }
 
-function drawImageLayer(ctx, l) {
+function drawImageLayer(ctx, l0, t = 0) {
+  // zoomKf [[t, zoom, fx, fy]]: zoom lento dentro del marco (la capa no cambia de tamaño)
+  const zk = l0.zoomKf ? kfValue(l0.zoomKf, t, [l0.zoom || 1, l0.fx ?? 0.5, l0.fy ?? 0.5]) : null;
+  const l = zk ? { ...l0, zoom: zk[0], fx: zk[1], fy: zk[2] } : l0;
   const a = assets.get(l.asset);
   if (l.shadow) { ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 18; }
   ctx.save();
@@ -827,7 +830,7 @@ const DRAW = {
   serp: (ctx, l, t) => drawSerp(ctx, l, t),
   text: (ctx, l, t) => drawText(ctx, l, t),
   shape: drawShape,
-  image: (ctx, l) => drawImageLayer(ctx, l),
+  image: (ctx, l, t) => drawImageLayer(ctx, l, t),
   mockup: (ctx, l, t) => drawMockup(ctx, l, t),
   chat: (ctx, l, t) => drawChat(ctx, l, t),
   caption: (ctx, l, t) => drawCaption(ctx, l, t),

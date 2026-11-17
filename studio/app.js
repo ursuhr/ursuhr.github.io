@@ -775,6 +775,7 @@ $('#btnScript').onclick = () => {
 
 // plantillas, abrir y guardar
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
+  ['Reel: Proceso web con clips', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso-clips')],
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
   ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
   ['Reel: SEO · Botox en Antofagasta', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('seo-botox')],
