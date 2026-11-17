@@ -24,7 +24,8 @@ ap.add_argument('--version', choices=['A', 'B'], default='B', help='A con la fot
 ap.add_argument('--name', default='neko-base')
 ap.add_argument('--zoom', type=float, default=1.10, help='encuadre más cerrado del ramen final (1 = sin zoom)')
 ap.add_argument('--zx', type=float, default=0.40); ap.add_argument('--zy', type=float, default=0.75)
-ap.add_argument('--no-machine-audio', action='store_true', help='mezcla solo música + palillos')
+ap.add_argument('--bpm', type=float, help='sincroniza los cortes con el pulso de la música (A 6 tiempos, B 6, C 3, D 3)')
+ap.add_argument('--music-start', type=float, default=0.0, help='segundo de la pista donde cae un tiempo; el reel parte ahí')
 a = ap.parse_args()
 os.makedirs(a.out, exist_ok=True)
 f = lambda n: os.path.join(a.src, f'IMG_{n}_720p.mp4')
@@ -37,6 +38,10 @@ A1 = (f('8186'), 0.00, 2.20); A2 = (f('8186'), 5.55, 0.85)       # 3,05 s: creci
 B = (f('8181'), 8.30, 3.00)
 C = (f('8182'), 2.40, 1.70)
 D = (f('8184'), 2.90, 1.70)
+if a.bpm:   # cortes sobre tiempos enteros: A->B (fundido) en el tiempo 6, B->C en el 12, C->D en el 15, D->palillos en el 18
+    bt = 60 / a.bpm
+    A2 = (f('8186'), 5.55, 0.85); A1 = (f('8186'), 0.00, 6 * bt + 0.1 - 0.85)
+    B = (f('8181'), 8.30, 6 * bt + 0.1); C = (f('8182'), 2.30, 3 * bt); D = (f('8184'), 2.90, 3 * bt + 0.15)
 E_DUR = 2.10 if a.version == 'A' else 0.0
 F = (a.sticks, 0.00, 4.50)               # termina en el segundo 4,5 del clip, sin congelar el fotograma
 XF_AB, XF_EF = 0.2, 0.3
@@ -84,18 +89,10 @@ cmd += ['-filter_complex', fc, '-map', '[vout]', '-an', '-t', str(TOTAL), '-c:v'
 print('video…'); subprocess.check_call(cmd)
 
 # ---- audio ----
-# Música suave de fondo + sonido de la máquina durante el gancho (opcional) + el sonido real de los fideos con palillos.
-parts, labels = [], []
-ai = ['-i', a.music, '-i', F[0]]
-parts.append(f"[0:a]atrim=0:{TOTAL},asetpts=PTS-STARTPTS,volume=0.55,afade=t=in:d=1.2,afade=t=out:st={TOTAL-1.8:.2f}:d=1.8[mus]"); labels.append('[mus]')
-parts.append(f"[1:a]atrim=0:{F[2]},asetpts=PTS-STARTPTS,highpass=f=80,volume=1.0,afade=t=in:d=0.25,afade=t=out:st={F[2]-0.5:.2f}:d=0.5,adelay={int(T_EF*1000)}|{int(T_EF*1000)}[stk]"); labels.append('[stk]')
-if not a.no_machine_audio:
-    ai += ['-i', A1[0]]
-    parts.append(f"[2:a]atrim=start={A1[1]}:duration={A1[2]},asetpts=PTS-STARTPTS,highpass=f=120,lowpass=f=6000,volume=0.5,afade=t=in:d=0.15[m1]")
-    parts.append(f"[2:a]atrim=start={A2[1]}:duration={A2[2]},asetpts=PTS-STARTPTS,highpass=f=120,lowpass=f=6000,volume=0.5,afade=t=out:d=0.25,adelay={int(A1[2]*1000)}|{int(A1[2]*1000)}[m2]")
-    labels += ['[m1]', '[m2]']
-parts.append(f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0:duration=longest,loudnorm=I=-16:TP=-1.5:LRA=9,atrim=0:{TOTAL}[aout]")
-cmd = ['ffmpeg', '-v', 'error', '-y'] + ai + ['-filter_complex', ';'.join(parts), '-map', '[aout]', '-ar', '48000', '-ac', '2', '-c:a', 'aac', '-b:a', '192k',
+# Solo música instrumental. Los audios originales de los videos se descartan por completo (sin voces ni ruido de máquina).
+mus = (f"[0:a]atrim=start={a.music_start}:duration={TOTAL + 0.05},asetpts=PTS-STARTPTS,afade=t=in:d=0.03,afade=t=out:st={TOTAL-1.4:.2f}:d=1.4,"
+       f"loudnorm=I=-15:TP=-1.5:LRA=9,atrim=0:{TOTAL}[aout]")
+cmd = ['ffmpeg', '-v', 'error', '-y', '-i', a.music, '-filter_complex', mus, '-map', '[aout]', '-ar', '48000', '-ac', '2', '-c:a', 'aac', '-b:a', '192k',
        os.path.join(a.out, a.name + '-audio.m4a')]
 print('audio…'); subprocess.check_call(cmd)
 subprocess.check_call(['ffmpeg', '-v', 'error', '-y', '-i', os.path.join(a.out, a.name + '-audio.m4a'), '-c:a', 'pcm_s16le', os.path.join(a.out, a.name + '-audio.wav')])
