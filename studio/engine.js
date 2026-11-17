@@ -909,13 +909,16 @@ export function hitTest(project, t, px, py) {
 
 // ---------- video ----------
 export function syncVideos(project, t, playing) {
+  // un mismo clip puede estar en varias capas: solo se pausa si ninguna capa activa lo está usando
+  const inUse = new Set();
+  for (const l of project.layers) if ((l.type === 'image' || l.type === 'mockup') && layerActive(l, t)) inUse.add(l.asset);
   for (const l of project.layers) {
     if (!(l.type === 'image' || l.type === 'mockup')) continue;
     const a = assets.get(l.asset);
     if (!a || a.kind !== 'video') continue;
     const el = a.el;
     el.muted = true;
-    if (!layerActive(l, t)) { if (!el.paused) el.pause(); continue; }
+    if (!layerActive(l, t)) { if (!inUse.has(l.asset) && !el.paused) el.pause(); continue; }
     const target = (l.trim || 0) + (t - l.start) * (l.speed || 1);
     if (playing) {
       if (Math.abs(el.currentTime - target) > 0.3) el.currentTime = target;
