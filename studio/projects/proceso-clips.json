@@ -1,6 +1,12 @@
 {
  "template": "proceso-clips",
- "rev": 1,
+ "rev": 2,
+ "media": {
+  "IMG_5232.mov": "assets/clips/IMG_5232.mov",
+  "IMG_5233.mov": "assets/clips/IMG_5233.mov",
+  "IMG_5235.mov": "assets/clips/IMG_5235.mov",
+  "IMG_5237.mov": "assets/clips/IMG_5237.mov"
+ },
  "name": "Reel · Cómo trabajo (clips)",
  "width": 1080,
  "height": 1920,

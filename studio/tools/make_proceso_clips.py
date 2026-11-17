@@ -75,6 +75,6 @@ for a,b,parts in CAP_P:
 L('sound','Música',0,DUR,0,0,0,0,asset='musica-1',volume=0.04,fadeIn=1.2,fadeOut=2.5)
 
 vo='Antes de construir tu página, te muestro cómo va a quedar. Primero conversamos de tu negocio y de lo que necesitas. Si hay que trabajar tu marca, partimos por ahí. Después investigo qué buscan tus clientes y qué hace tu competencia. Con eso armo el prototipo, lo revisamos juntos y hacemos los cambios. Cuando está aprobado, la construyo en Elementor para que tú puedas editarla. Le dejo la base SEO para que Google la entienda. Y al entregarla, te enseño a usarla y tienes 30 días de soporte. Estás pensando en hacer tu web? Cuéntame de tu negocio.'
-proj=dict(template='proceso-clips',rev=1,name='Reel · Cómo trabajo (clips)',width=1080,height=1920,fps=30,duration=DUR,background=IV,voiceover=vo,layers=layers)
+proj=dict(template='proceso-clips',rev=2,media={f'IMG_{n}.mov':f'assets/clips/IMG_{n}.mov' for n in ('5232','5233','5235','5237')},name='Reel · Cómo trabajo (clips)',width=1080,height=1920,fps=30,duration=DUR,background=IV,voiceover=vo,layers=layers)
 json.dump(proj,open(ROOT+'projects/proceso-clips.json','w'),ensure_ascii=False,indent=1)
 print(len(layers),'capas · duración',DUR)
