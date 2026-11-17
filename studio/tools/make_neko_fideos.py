@@ -15,24 +15,30 @@ def L(type, name, start, end, x, y, w, h, **k):
 
 L('image', 'Montaje (neko-B.mp4)', 0, DUR, 540, 960, 1080, 1920, asset='neko-B.mp4', fit='cover', placeholder='Importa neko-B.mp4')
 
-def bloque(nombre, a, z, kicker, titulo, ky, ty, th, scrim_y=1130, alpha=0.55, fade_out=True, arriba=False):
-    """degradado de lectura + kicker (Raleway, crema) + título (Anton, mostaza). Entradas suaves: solo fundido."""
+def bloque(nombre, a, z, kicker, titulo, ky, ty, th, fondo=None, fade_out=True, anim=0.35, retraso=0.15, ksize=62, tsize=None):
+    """Kicker (Raleway, crema) + título (Anton, mostaza). Entradas suaves: solo fundido.
+    fondo: None | ('abajo'|'arriba', y, alpha) degradado de lectura | ('halo', cx, cy, w, h, opacidad) sombra suave y local detrás del texto."""
     out = 'fade' if fade_out else 'none'
-    if arriba:   # degradado desde el borde superior hasta scrim_y
-        L('shape', f'Degradado · {nombre}', a - 0.1, z, 540, scrim_y / 2, 1080, scrim_y, kind='scrim', color=NEGRO, alpha=alpha, dir='up', animIn='fade', animOut=out, animDur=0.5)
-    else:
-        L('shape', f'Degradado · {nombre}', a - 0.1, z, 540, (scrim_y + 1920) / 2, 1080, 1920 - scrim_y, kind='scrim', color=NEGRO, alpha=alpha, dir='down', animIn='fade', animOut=out, animDur=0.5)
-    L('text', f'Kicker · {nombre}', a + 0.05, z, 540, ky, 912, 76, text=kicker, font='raleway', weight=600, caps=False, size=52, color=CREMA, align='left',
-      lh=1.1, animIn='fade', animOut=out, animDur=0.5)
-    L('text', f'Título · {nombre}', a + 0.2, z, 540, ty, 912, th, text=titulo, font='anton', size=124 if '\n' in titulo else 128, color=MOSTAZA, accent=MOSTAZA, align='left',
-      lh=1.14 if '\n' in titulo else 1.0, animIn='fade', animOut=out, animDur=0.5)
+    if fondo and fondo[0] in ('abajo', 'arriba'):
+        _, sy, al = fondo
+        if fondo[0] == 'arriba':
+            L('shape', f'Degradado · {nombre}', a, z, 540, sy / 2, 1080, sy, kind='scrim', color=NEGRO, alpha=al, dir='up', animIn='fade', animOut=out, animDur=anim)
+        else:
+            L('shape', f'Degradado · {nombre}', a, z, 540, (sy + 1920) / 2, 1080, 1920 - sy, kind='scrim', color=NEGRO, alpha=al, dir='down', animIn='fade', animOut=out, animDur=anim)
+    elif fondo and fondo[0] == 'halo':
+        _, cx, cy, w, h, op = fondo
+        L('shape', f'Sombra suave · {nombre}', a, z, cx, cy, w, h, kind='halo', color=NEGRO, opacity=op, animIn='fade', animOut=out, animDur=anim)
+    L('text', f'Kicker · {nombre}', a, z, 540, ky, 912, 84, text=kicker, font='raleway', weight=600, caps=False, size=ksize, color=CREMA, align='left',
+      lh=1.1, animIn='fade', animOut=out, animDur=anim)
+    L('text', f'Título · {nombre}', a + retraso, z, 540, ty, 912, th, text=titulo, font='anton', size=tsize or (124 if '\n' in titulo else 128), color=MOSTAZA, accent=MOSTAZA, align='left',
+      lh=1.14 if '\n' in titulo else 1.0, animIn='fade', animOut=out, animDur=anim)
 
-# 1) gancho sobre los fideos creciendo; se retira antes de que la cortina clara llene el cuadro
-bloque('Gancho', 0.15, 2.55, '¿Sabías que hacemos', 'los fideos\naquí mismo?', 1215, 1410, 283, scrim_y=1080, alpha=0.72)
-# 2) preparación
-bloque('Receta', T['B'] + 0.35, T['C'] - 0.05, 'Con nuestra', 'propia receta.', 1370, 1465, 140, scrim_y=1150, alpha=0.72)
-# 3) cierre sobre el ramen terminado; se queda hasta el final del reel
-bloque('Cierre', T['palillos_pleno'] + 0.2, DUR, 'De nuestra cocina', 'a tu bowl.', 290, 400, 140, scrim_y=640, alpha=0.62, fade_out=False, arriba=True)
+# 1) gancho sobre los fideos creciendo: entra en el primer fotograma (fundido de 0,2 s) y se retira antes de que la cortina clara llene el cuadro
+bloque('Gancho', 0.0, 2.6, '¿Sabías que hacemos', 'los fideos\naquí mismo?', 1195, 1400, 283, fondo=('abajo', 1060, 0.72), anim=0.2, retraso=0.05)
+# 2) preparación: sobre la zona oscura de la maquinaria (abajo a la izquierda), con una sombra suave y local, sin degradados grandes
+bloque('Receta', T['B'] + 0.25, T['C'] - 0.05, 'Con nuestra', 'propia\nreceta.', 995, 1163, 250, fondo=('halo', 300, 1130, 860, 580, 1.0), ksize=56, tsize=108)
+# 3) cierre sobre el ramen terminado: se retira en el segundo 11 y los últimos 2 s quedan solo con los fideos
+bloque('Cierre', T['palillos_pleno'] + 0.2, 11.0, 'De nuestra cocina', 'a tu bowl.', 290, 400, 140, fondo=('arriba', 640, 0.62))
 
 proj = dict(template='neko-fideos', rev=1, name='Reel · Fideos hechos en casa (Neko Ramen)', width=1080, height=1920, fps=30, duration=DUR,
             background=NEGRO, voiceover='¿Sabías que hacemos los fideos aquí mismo?\n\nCon nuestra propia receta.\n\nDe nuestra cocina a tu bowl.', layers=layers)
