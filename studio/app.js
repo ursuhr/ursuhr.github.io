@@ -113,8 +113,24 @@ async function loadTemplate(name) {
     if (name === 'blank') { setProject(blankProject()); return; }
     const r = await fetch(`projects/${name}.json`, { cache: 'no-cache' });
     if (!r.ok) throw new Error(r.status);
-    setProject(await r.json());
+    const proj = await r.json();
+    if (proj.media) await loadTemplateMedia(proj.media);
+    setProject(proj);
   } catch (e) { toast('No pude cargar la plantilla'); console.error(e); }
+}
+// Medios que la plantilla trae consigo ({ nombre: url }): se cargan solos si todavía no están en la sesión.
+async function loadTemplateMedia(map) {
+  const todo = Object.entries(map).filter(([nm]) => !assets.has(nm));
+  if (!todo.length) return;
+  toast('Cargando los clips de la plantilla…');
+  for (const [nm, url] of todo) {
+    try {
+      const rr = await fetch(url); if (!rr.ok) continue;
+      const ext = (nm.match(/\.([^.]+)$/) || [])[1]?.toLowerCase(); // el tipo sale de la extensión: no todos los servidores lo declaran
+      const type = { mov: 'video/mp4', mp4: 'video/mp4', m4v: 'video/mp4', webm: 'video/webm', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' }[ext] || (await rr.clone().blob()).type;
+      await registerMedia(new File([await rr.blob()], nm, { type }), nm);
+    } catch (e) { console.warn('clip no cargado', nm, e); }
+  }
 }
 
 // ---------- capas ----------
