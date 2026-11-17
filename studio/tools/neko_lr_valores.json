@@ -1,16 +1,99 @@
 {
   "_nota": "Controles equivalentes a Lightroom. Exposición en EV; el resto en escala conceptual -100 a +100. Cada clip se edita por separado. Sin viñeta, sin máscaras, sin luz localizada, sin glow, sin grano, sin presets y sin filtro cálido adicional.",
   "clips": {
-    "8186":  {"exposicion": 0.00, "contraste": 8,  "iluminaciones": -20, "sombras": 0,  "blancos": 3, "negros": -10, "temperatura": 3, "intensidad": 4, "saturacion": -3,
-              "hsl": {"azul": {"sat": -25, "lum": -15}, "amarillo": {"sat": -5, "lum": 0}}},
-    "8181":  {"exposicion": 0.10, "contraste": 10, "iluminaciones": -20, "sombras": 10, "blancos": 4, "negros": -8,  "temperatura": 2, "intensidad": 4, "saturacion": 0,
-              "hsl": {"amarillo": {"sat": -10, "lum": 5}}},
-    "8182":  {"exposicion": 0.15, "contraste": 8,  "iluminaciones": -15, "sombras": 12, "blancos": 4, "negros": -6,  "temperatura": 3, "intensidad": 4, "saturacion": -2,
-              "hsl": {"amarillo": {"sat": -10, "lum": 5}}},
-    "8184":  {"exposicion": 0.15, "contraste": 8,  "iluminaciones": -15, "sombras": 12, "blancos": 4, "negros": -6,  "temperatura": 3, "intensidad": 4, "saturacion": -2,
-              "hsl": {"amarillo": {"sat": -10, "lum": 5}}},
-    "ramen": {"exposicion": 0.00, "contraste": 10, "iluminaciones": -25, "sombras": 10, "blancos": 0, "negros": -8,  "temperatura": 2, "intensidad": 8, "saturacion": 0,
-              "hsl": {"naranja": {"sat": -4, "lum": 6}, "amarillo": {"sat": -5, "lum": 0}}}
+    "8186": {
+      "exposicion": 0.0,
+      "contraste": 8,
+      "iluminaciones": -20,
+      "sombras": 0,
+      "blancos": 3,
+      "negros": -10,
+      "temperatura": 3,
+      "intensidad": 4,
+      "saturacion": -3,
+      "hsl": {
+        "azul": {
+          "sat": -25,
+          "lum": -15
+        },
+        "amarillo": {
+          "sat": -5,
+          "lum": 0
+        }
+      }
+    },
+    "8181": {
+      "exposicion": 0.1,
+      "contraste": 10,
+      "iluminaciones": -20,
+      "sombras": 10,
+      "blancos": 4,
+      "negros": -8,
+      "temperatura": 2,
+      "intensidad": 4,
+      "saturacion": 0,
+      "hsl": {
+        "amarillo": {
+          "sat": -10,
+          "lum": 5
+        }
+      }
+    },
+    "8182": {
+      "exposicion": 0.1,
+      "contraste": 14,
+      "iluminaciones": -18,
+      "sombras": 6,
+      "blancos": 2,
+      "negros": -12,
+      "temperatura": 2,
+      "intensidad": 4,
+      "saturacion": -2,
+      "hsl": {
+        "amarillo": {
+          "sat": -12,
+          "lum": 2
+        }
+      }
+    },
+    "8184": {
+      "exposicion": 0.1,
+      "contraste": 14,
+      "iluminaciones": -18,
+      "sombras": 6,
+      "blancos": 2,
+      "negros": -12,
+      "temperatura": 2,
+      "intensidad": 4,
+      "saturacion": -2,
+      "hsl": {
+        "amarillo": {
+          "sat": -12,
+          "lum": 2
+        }
+      }
+    },
+    "ramen": {
+      "exposicion": -0.05,
+      "contraste": 16,
+      "iluminaciones": -10,
+      "sombras": 2,
+      "blancos": -6,
+      "negros": -14,
+      "temperatura": 1,
+      "intensidad": 10,
+      "saturacion": 3,
+      "hsl": {
+        "naranja": {
+          "sat": 4,
+          "lum": -4
+        },
+        "amarillo": {
+          "sat": -8,
+          "lum": -6
+        }
+      }
+    }
   },
   "calibracion": {
     "_nota": "Constantes con las que este script traduce la escala -100..+100 a operaciones reales. Cambian el efecto de cada deslizador, no el valor de cada clip.",
@@ -25,5 +108,13 @@
     "hsl_sat": 1.0,
     "hsl_lum": 0.8
   },
-  "efectos": {"vineta": 0, "mascaras_spotlight": false, "luz_localizada": false, "glow": 0, "grano": 0, "presets": "ninguno", "filtro_calido_adicional": false}
+  "efectos": {
+    "vineta": 0,
+    "mascaras_spotlight": false,
+    "luz_localizada": false,
+    "glow": 0,
+    "grano": 0,
+    "presets": "ninguno",
+    "filtro_calido_adicional": false
+  }
 }

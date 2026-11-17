@@ -11,13 +11,14 @@ _f = (glob.glob('/usr/share/fonts/**/DejaVuSans.ttf', recursive=True) or glob.gl
 FONT = ImageFont.truetype(_f[0], 10) if _f else None
 ap = argparse.ArgumentParser()
 ap.add_argument('--src', required=True); ap.add_argument('--sticks', required=True); ap.add_argument('--out', required=True)
-ap.add_argument('--w', type=int, default=300); ap.add_argument('--metrics', action='store_true')
+ap.add_argument('--only', nargs='*', help='claves a mostrar: 8186 8181 8182 8184 ramen'); ap.add_argument('--w', type=int, default=300); ap.add_argument('--metrics', action='store_true')
 a = ap.parse_args()
 W, H = a.w, int(a.w * 16 / 9)
 up = f'scale=-2:{H}:flags=lanczos,crop={W}:{H}'
 v = lambda n: os.path.join(a.src, f'IMG_{n}_720p.mp4')
 cols = [('IMG_8186 · máquina', v('8186'), 1.2, '8186'), ('IMG_8181 · preparación', v('8181'), 9.8, '8181'), ('IMG_8182 · preparación', v('8182'), 3.0, '8182'),
         ('IMG_8184 · preparación', v('8184'), 3.6, '8184'), ('Ramen terminado', a.sticks, 2.2, 'ramen')]
+if a.only: cols = [c for c in cols if c[3] in a.only]
 tmp = tempfile.mkdtemp(); luts = neko_lr.luts(tmp); d = neko_lr.cargar()
 def fr(src, t, vf, n):
     out = os.path.join(tmp, n + '.png')
