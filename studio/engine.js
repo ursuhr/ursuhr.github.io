@@ -105,6 +105,10 @@ function layoutText(ctx, l) {
 const measureCtx = document.createElement('canvas').getContext('2d');
 
 function drawText(ctx, l, t = 0) {
+  if (l.count) { // contador animado: count {from,to,at,dur,dec,suffix}
+    const c = l.count; const k = clamp((t - c.at) / c.dur, 0, 1); const v = c.from + (c.to - c.from) * eo(k);
+    l = { ...l, text: v.toFixed(c.dec ?? 1).replace('.', ',') + (c.suffix || '') };
+  }
   const { lines, lh, h, space } = layoutText(ctx, l);
   const letters = l.animIn === 'letters'; let ci = 0;
   ctx.textBaseline = 'middle';
@@ -760,8 +764,67 @@ function drawChat(ctx, l, t) {
   ctx.restore();
 }
 
+
+// ---------- resultado de búsqueda (genérico, oscuro) ----------
+// Props: query, typeAt, typeDur, cardAt, titleOld, titleNew, grayAt, circleAt, eraseAt, eraseDur, typeNewAt, typeDur2, glowAt, labelOld, labelNew, desc [2 líneas]
+function drawSerp(ctx, l, t) {
+  const w = l.w, h = l.h, x0 = -w / 2, y0 = -h / 2, GR = '#8A8A90';
+  const bh = 104;
+  ctx.fillStyle = '#1E1E21'; roundRect(ctx, x0, y0, w, bh, bh / 2); ctx.fill();
+  ctx.strokeStyle = '#3A3A3F'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.strokeStyle = GR; ctx.lineWidth = 5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(x0 + 56, y0 + bh / 2 - 3, 15, 0, Math.PI * 2); ctx.moveTo(x0 + 67, y0 + bh / 2 + 8); ctx.lineTo(x0 + 80, y0 + bh / 2 + 21); ctx.stroke();
+  const q = l.query || ''; const qk = clamp((t - (l.typeAt ?? 0)) / (l.typeDur || 1.2), 0, 1);
+  ctx.font = `400 42px ${FONTS.body}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  const qs = q.slice(0, Math.floor(q.length * qk));
+  ctx.fillStyle = BRAND.ivory; ctx.fillText(qs, x0 + 108, y0 + bh / 2 + 2);
+  if (t >= (l.typeAt ?? 0) && t < (l.cardAt ?? 1e9) + 0.4 && (qk < 1 || Math.floor(t * 3) % 2 === 0)) { ctx.fillStyle = BRAND.sky; ctx.fillRect(x0 + 112 + ctx.measureText(qs).width, y0 + bh / 2 - 22, 3, 44); }
+  const cp = clamp((t - (l.cardAt ?? 0)) / 0.5, 0, 1); if (cp <= 0) return;
+  ctx.save(); ctx.globalAlpha *= cp; ctx.translate(0, (1 - eo(cp)) * 40);
+  const ly = y0 + bh + 66, swapped = t >= (l.eraseAt ?? 1e9) + (l.eraseDur || 1);
+  const lab = swapped ? (l.labelNew || 'DESPUÉS') : (l.labelOld || 'ANTES');
+  ctx.font = `700 26px ${FONTS.body}`; ctx.letterSpacing = '5px';
+  const lw = ctx.measureText(lab).width + 52;
+  ctx.fillStyle = swapped ? BRAND.coral : '#2A2A2E'; roundRect(ctx, x0, ly - 27, lw, 54, 27); ctx.fill();
+  ctx.fillStyle = swapped ? BRAND.black : '#B5B5BA'; ctx.fillText(lab, x0 + 28, ly + 2); ctx.letterSpacing = '0px';
+  const top = ly + 52, ch = 400;
+  ctx.fillStyle = '#151517'; roundRect(ctx, x0, top, w, ch, 30); ctx.fill(); ctx.strokeStyle = '#2B2B2F'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#34343A'; ctx.beginPath(); ctx.arc(x0 + 68, top + 56, 21, 0, Math.PI * 2); ctx.fill();
+  ctx.save(); ctx.filter = 'blur(6px)'; ctx.fillStyle = '#6A6A70'; roundRect(ctx, x0 + 108, top + 36, 230, 18, 9); ctx.fill(); ctx.fillStyle = '#4A4A50'; roundRect(ctx, x0 + 108, top + 62, 150, 14, 7); ctx.fill(); ctx.restore();
+  const old = l.titleOld || '', nw = l.titleNew || '';
+  const tf = `700 54px ${FONTS.body}`; ctx.font = tf;
+  const tx = x0 + 48, ty = top + 150;
+  let s = old, typing = false, col = BRAND.ivory;
+  const eAt = l.eraseAt ?? 1e9;
+  if (t < eAt && l.grayAt != null) { const k = eo(clamp((t - l.grayAt) / 0.5, 0, 1)); const m = (a, b) => Math.round(a + (b - a) * k); col = `rgb(${m(245, 108)},${m(241, 108)},${m(232, 114)})`; }
+  if (t >= eAt) { const k = clamp((t - eAt) / (l.eraseDur || 1), 0, 1); s = old.slice(0, Math.ceil(old.length * (1 - k))); typing = k < 1; }
+  if (t >= (l.typeNewAt ?? 1e9)) { const k = clamp((t - l.typeNewAt) / (l.typeDur2 || 1.4), 0, 1); s = nw.slice(0, Math.ceil(nw.length * k)); typing = k < 1; }
+  ctx.fillStyle = col; ctx.fillText(s, tx, ty);
+  const sw = ctx.measureText(s).width, oldW = ctx.measureText(old).width, nwW = ctx.measureText(nw).width;
+  const caretOn = t >= eAt && t < (l.typeNewAt ?? 1e9) + (l.typeDur2 || 1.4) + 0.5 && (typing || Math.floor(t * 4) % 2 === 0);
+  if (caretOn) { ctx.fillStyle = BRAND.coral; ctx.fillRect(tx + sw + 4, ty - 30, 4, 60); }
+  // círculo a mano alzada en azul cielo
+  if (l.circleAt != null && t >= l.circleAt && t < eAt) {
+    const u = clamp((t - l.circleAt) / 0.6, 0, 1), fade = clamp((eAt - t) / 0.25, 0, 1);
+    ctx.save(); ctx.globalAlpha *= fade; ctx.strokeStyle = BRAND.sky; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.beginPath();
+    const cx = tx + oldW / 2, rx = oldW / 2 + 38, ry = 48, n = 60, a0 = -2.3;
+    for (let i = 0; i <= n * eo(u); i++) { const a = a0 + (i / n) * Math.PI * 2.25, r = 1 + 0.07 * (i / n) + 0.012 * Math.sin(a * 3); const px = cx + Math.cos(a) * rx * r, py = ty + Math.sin(a) * ry * r; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.stroke(); ctx.restore();
+  }
+  // subrayado coral con brillo
+  if (l.glowAt != null && t >= l.glowAt) {
+    const u = eo(clamp((t - l.glowAt) / 0.5, 0, 1));
+    ctx.save(); ctx.shadowColor = BRAND.coral; ctx.shadowBlur = 26; ctx.strokeStyle = BRAND.coral; ctx.lineWidth = 7; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(tx, ty + 42); ctx.lineTo(tx + nwW * u, ty + 42); ctx.stroke(); ctx.restore();
+  }
+  ctx.font = `400 33px ${FONTS.body}`; ctx.fillStyle = '#9A9AA0';
+  (l.desc || []).forEach((d, i) => ctx.fillText(d, tx, top + 252 + i * 50));
+  ctx.restore();
+}
+
 // ---------- capas ----------
 const DRAW = {
+  serp: (ctx, l, t) => drawSerp(ctx, l, t),
   text: (ctx, l, t) => drawText(ctx, l, t),
   shape: drawShape,
   image: (ctx, l) => drawImageLayer(ctx, l),
