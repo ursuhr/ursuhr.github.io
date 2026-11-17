@@ -358,6 +358,9 @@ const MEDIA_FIELDS = [
   F('zoom', 'Zoom', 'number', { step: 0.1, def: () => 1 }),
   F('fx', 'Enfoque X (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
   F('fy', 'Enfoque Y (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
+  F('zoomEnd', 'Zoom final (zoom lento)', 'number', { step: 0.1 }),
+  F('fxEnd', 'Enfoque X final', 'number', { step: 0.05 }),
+  F('fyEnd', 'Enfoque Y final', 'number', { step: 0.05 }),
   F('trim', 'Inicio del clip (s)', 'number', { step: 0.1 }), F('speed', 'Velocidad', 'number', { step: 0.1 }),
 ];
 const SCHEMA = {
@@ -775,8 +778,11 @@ $('#btnScript').onclick = () => {
 
 // plantillas, abrir y guardar
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
+  ['Reel: Proceso web con clips', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso-clips')],
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
   ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
+  ['Reel: SEO · Botox en Antofagasta', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('seo-botox')],
+  ['Portada: caso SEO Antofagasta', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('seo-botox-portada')],
   ['Reel: Un millón por cambiar una foto', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('millon-foto')],
   ['Reel: Los $200.000 por las claves (historia)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('clienta-200k')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
