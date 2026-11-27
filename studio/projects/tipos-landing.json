@@ -1,6 +1,6 @@
 {
  "template": "tipos-landing",
- "rev": 1,
+ "rev": 2,
  "media": {
   "dravale-scroll.mp4": "assets/clips/dravale-scroll.mp4",
   "matchamatch-scroll.mp4": "assets/clips/matchamatch-scroll.mp4"
@@ -227,7 +227,7 @@
    "animIn": "pop",
    "animOut": "fade",
    "animDur": 0.35,
-   "text": "*Pero cuál?*",
+   "text": "*¿Pero cuál?*",
    "font": "title",
    "size": 112,
    "color": "#0B0B0B",
@@ -753,7 +753,7 @@
    "animIn": "fade",
    "animOut": "none",
    "animDur": 0.3,
-   "text": "Qué quieres que haga la persona\nque entra a tu web?",
+   "text": "¿Qué quieres que haga la persona\nque entra a tu web?",
    "font": "body",
    "size": 48,
    "bold": false,

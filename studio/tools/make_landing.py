@@ -37,7 +37,7 @@ L('text','URSULAHR',0,DUR,800,140,400,60,text='URSULAHR',font='body',bold=True,s
 
 # ---- 1. Gancho ----
 title('Gancho 1',0.05,3.0,640,'Pediste una\npágina web.',104,250)
-title('Gancho 2',PERO_CUAL,3.0,930,'*Pero cuál?*',112,160,animIn='pop',hitAt=PERO_CUAL)
+title('Gancho 2',PERO_CUAL,3.0,930,'*¿Pero cuál?*',112,160,animIn='pop',hitAt=PERO_CUAL)
 
 # ---- 2. Definición + tarjeta de la serie ----
 a,b=T['defi']
@@ -75,7 +75,7 @@ pill('Pill sin tienda',23.2,b,540,1660,600,86,'Vende sin tener tienda propia',SK
 # ---- 5. Cierre ----
 a,b=T['cierre']
 title('Cierre',a+0.05,b,560,'Piensa en\n*tu negocio.*',108,260,animOut='none')
-body('Cierre · pregunta',PREGUNTA,b,800,'Qué quieres que haga la persona\nque entra a tu web?',48,130,animOut='none')
+body('Cierre · pregunta',PREGUNTA,b,800,'¿Qué quieres que haga la persona\nque entra a tu web?',48,130,animOut='none')
 pill('Botón escríbeme',ESCRIBEME,b,460,1060,720,124,'Escríbeme · link en mi perfil',CO,BK,38,animOut='none',shadow=True,arrowIcon=True,arrowColor=BK,animDur=0.4,hitAt=ESCRIBEME)
 body('Próximo',30.4,b,1220,'Próximo: Multipágina',38,60,color=BK,bold=True,animOut='none')
 
@@ -95,7 +95,7 @@ L('sound','Música',0,DUR,0,0,0,0,asset='musica-1',volume=0.04,fadeIn=1.2,fadeOu
 
 vo='Pediste una página web. Pero cuál.\n\nUna landing es una sola página que reúne lo que alguien necesita saber antes de dar un paso, como pedir una hora o comprar.\n\nMira la de la Dra. Vale. Lees sobre sus tratamientos de armonización facial y puedes contactarla por formulario o por WhatsApp.\n\nEn MatchaMatch, en cambio, el botón de compra te lleva directo a Mercado Libre.\n\nPiensa en tu negocio. ¿Qué quieres que haga la persona que entra a tu web? Si tienes dudas, escríbeme y lo vemos.'
 media={'dravale-scroll.mp4':'assets/clips/dravale-scroll.mp4','matchamatch-scroll.mp4':'assets/clips/matchamatch-scroll.mp4'}
-proj=dict(template='tipos-landing',rev=1,media=media,name='Reel · Tipos de páginas web 1: la landing',width=1080,height=1920,fps=30,duration=DUR,background=IV,voiceover=vo,layers=layers)
+proj=dict(template='tipos-landing',rev=2,media=media,name='Reel · Tipos de páginas web 1: la landing',width=1080,height=1920,fps=30,duration=DUR,background=IV,voiceover=vo,layers=layers)
 json.dump(proj,open(ROOT+'projects/tipos-landing.json','w'),ensure_ascii=False,indent=1)
 print(len(layers),'capas · duración',DUR)
 
@@ -104,8 +104,8 @@ layers.clear(); n=itertools.count(1)
 L('shape','Halo portada',0,1,900,1800,1700,1700,kind='halo',color=CO,color2=SK,opacity=0.55)
 L('logo','Logo HR',0,1,190,330,150,100,variant='dark')
 L('text','URSULAHR',0,1,800,330,400,60,text='URSULAHR',font='body',bold=True,size=40,color=BK,align='right',tracking=0.2)
-L('text','Título portada',0,1,520,900,840,520,text='Pediste una\npágina web.\nPero *cuál?*',font='title',size=110,color=BK,align='left',lh=1.08,accent=CO)
+L('text','Título portada',0,1,520,900,840,520,text='Pediste una\npágina web.\n¿Pero *cuál?*',font='title',size=110,color=BK,align='left',lh=1.08,accent=CO)
 L('shape','Etiqueta serie',0,1,420,1500,660,84,kind='pill',color=BK,label='TIPOS DE PÁGINAS WEB · 1',labelColor=IV,labelSize=34)
 L('shape','Flecha',0,1,900,1500,80,80,kind='arrow',color=BK,rot=0)
-cov=dict(template='tipos-landing-portada',rev=1,name='Portada · Tipos de páginas web 1',width=1080,height=1920,fps=30,duration=1,background=IV,voiceover='',layers=layers)
+cov=dict(template='tipos-landing-portada',rev=2,name='Portada · Tipos de páginas web 1',width=1080,height=1920,fps=30,duration=1,background=IV,voiceover='',layers=layers)
 json.dump(cov,open(ROOT+'projects/tipos-landing-portada.json','w'),ensure_ascii=False,indent=1)

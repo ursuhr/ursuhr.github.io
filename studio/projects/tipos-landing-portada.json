@@ -1,6 +1,6 @@
 {
  "template": "tipos-landing-portada",
- "rev": 1,
+ "rev": 2,
  "name": "Portada · Tipos de páginas web 1",
  "width": 1080,
  "height": 1920,
@@ -83,7 +83,7 @@
    "animIn": "none",
    "animOut": "none",
    "animDur": 0.45,
-   "text": "Pediste una\npágina web.\nPero *cuál?*",
+   "text": "Pediste una\npágina web.\n¿Pero *cuál?*",
    "font": "title",
    "size": 110,
    "color": "#0B0B0B",
