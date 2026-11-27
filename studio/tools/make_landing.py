@@ -52,15 +52,15 @@ pill('Pill pedir una hora',PEDIR_HORA,b,365,1330,330,96,'Pedir una hora',BK,IV,3
 pill('Pill comprar',COMPRAR,b,680,1330,240,96,'Comprar',SK,BK,38,hitAt=COMPRAR)
 
 # ---- 3. Ejemplo real: Dra. Vale ----
-PHONE=dict(x=540,y=1010,w=470,h=960)
+PHONE=dict(x=540,y=915,w=410,h=820)   # más chico: queda sobre los 320 px de abajo que tapa Instagram
 a,b=T['vale']
 body('Vale · etiqueta',a+0.05,b,300,'Ejemplo real',40,60,color=CO,bold=True)
 title('Vale · dominio',a+0.05,b,390,'dravale.cl',88,120)
 # inicio del sitio y después el formulario (grabación vertical del sitio en el celular)
 L('mockup','Celular · Dra. Vale inicio',a,13.8,**PHONE,kind='phone',asset='dravale-scroll.mp4',trim=0.0,speed=1.0,fit='cover',placeholder='Grabación de dravale.cl',animIn='rise',animOut='none',animDur=0.4)
 L('mockup','Celular · Dra. Vale formulario',13.8,b,**PHONE,kind='phone',asset='dravale-scroll.mp4',trim=6.0,speed=0.5,fit='cover',placeholder='Formulario de dravale.cl')
-pill('Pill formulario',FORMULARIO,b,400,1560,290,88,'Formulario',SK,BK,36,hitAt=FORMULARIO)
-pill('Pill WhatsApp',WHATSAPP,b,700,1560,290,88,'WhatsApp',CO,BK,36,hitAt=WHATSAPP)
+pill('Pill formulario',FORMULARIO,b,400,1410,290,88,'Formulario',SK,BK,36,hitAt=FORMULARIO)
+pill('Pill WhatsApp',WHATSAPP,b,700,1410,290,88,'WhatsApp',CO,BK,36,hitAt=WHATSAPP)
 
 # ---- 4. Ejemplo real: MatchaMatch ----
 a,b=T['matcha']
@@ -69,8 +69,8 @@ title('Matcha · dominio',a+0.05,b,390,'matchamatch.cl',80,120)
 L('mockup','Celular · MatchaMatch producto',a,21.1,**PHONE,kind='phone',asset='matchamatch-scroll.mp4',trim=3.4,speed=1.0,fit='cover',placeholder='Grabación de matchamatch.cl')
 L('mockup','Celular · MatchaMatch botón',21.1,b,**PHONE,kind='phone',asset='matchamatch-scroll.mp4',trim=5.45,speed=0.02,fit='cover',placeholder='Botón Comprar ahora',
   scaleKf=[[21.1,1],[21.6,1.06],[b,1.06]])
-pill('Pill comprar ahora',21.1,b,540,1560,620,86,'Comprar ahora → Mercado Libre',CO,BK,34,hitAt=21.1)
-pill('Pill sin tienda',23.2,b,540,1660,600,86,'Vende sin tener tienda propia',SK,BK,34,hitAt=23.2)
+pill('Pill comprar ahora',21.1,23.2,540,1410,620,86,'Comprar ahora → Mercado Libre',CO,BK,34,hitAt=21.1)
+pill('Pill sin tienda',23.2,b,540,1410,600,86,'Vende sin tener tienda propia',SK,BK,34,hitAt=23.2)
 
 # ---- 5. Cierre ----
 a,b=T['cierre']
@@ -78,6 +78,17 @@ title('Cierre',a+0.05,b,560,'Piensa en\n*tu negocio.*',108,260,animOut='none')
 body('Cierre · pregunta',PREGUNTA,b,800,'¿Qué quieres que haga la persona\nque entra a tu web?',48,130,animOut='none')
 pill('Botón escríbeme',ESCRIBEME,b,460,1060,720,124,'Escríbeme · link en mi perfil',CO,BK,38,animOut='none',shadow=True,arrowIcon=True,arrowColor=BK,animDur=0.4,hitAt=ESCRIBEME)
 body('Próximo',30.4,b,1220,'Próximo: Multipágina',38,60,color=BK,bold=True,animOut='none')
+
+# ---- subtítulos: cláusulas con sentido, tiempos medidos en la voz real (voz_landing.mp3, 30,8 s) ----
+CAP=[(0.0,1.25,'Pediste una página web.'),(1.70,2.45,'¿Pero cuál?'),(3.08,4.01,'Una landing es una sola página'),
+ (4.16,6.0,'que reúne lo que alguien necesita'),(6.0,8.1,'saber antes de dar un paso,'),(8.2,10.83,'como pedir una hora o comprar.'),
+ (11.25,12.78,'Mira la de la Dra. Vale.'),
+ (13.27,14.67,'Lees sobre sus tratamientos'),(14.67,15.81,'de armonización facial'),(15.81,16.9,'y puedes contactarla'),(16.9,18.45,'por formulario o por WhatsApp.'),
+ (18.96,20.59,'En MatchaMatch, en cambio,'),(20.79,21.7,'el botón de compra'),(21.7,23.47,'te lleva directo a Mercado Libre.'),
+ (24.17,25.08,'Piensa en tu negocio.'),(25.61,26.96,'¿Qué quieres que haga la persona'),(26.96,27.76,'que entra a tu web?'),
+ (28.33,29.42,'Si tienes dudas,'),(29.42,30.85,'escríbeme y lo vemos.')]
+for i,(a,b,txt) in enumerate(CAP):
+    L('caption',f'Subtítulos {i+1}',a,b+0.05,540,1520,960,110,text=txt,size=54,capStyle='pill',maxWords=9,capAlign='center',accent='#FFFFFF')
 
 # ---- sonido ----
 def snd(name,asset,start,vol):
@@ -95,7 +106,7 @@ L('sound','Música',0,DUR,0,0,0,0,asset='musica-1',volume=0.04,fadeIn=1.2,fadeOu
 
 vo='Pediste una página web. Pero cuál.\n\nUna landing es una sola página que reúne lo que alguien necesita saber antes de dar un paso, como pedir una hora o comprar.\n\nMira la de la Dra. Vale. Lees sobre sus tratamientos de armonización facial y puedes contactarla por formulario o por WhatsApp.\n\nEn MatchaMatch, en cambio, el botón de compra te lleva directo a Mercado Libre.\n\nPiensa en tu negocio. ¿Qué quieres que haga la persona que entra a tu web? Si tienes dudas, escríbeme y lo vemos.'
 media={'dravale-scroll.mp4':'assets/clips/dravale-scroll.mp4','matchamatch-scroll.mp4':'assets/clips/matchamatch-scroll.mp4'}
-proj=dict(template='tipos-landing',rev=2,media=media,name='Reel · Tipos de páginas web 1: la landing',width=1080,height=1920,fps=30,duration=DUR,background=IV,voiceover=vo,layers=layers)
+proj=dict(template='tipos-landing',rev=4,media=media,name='Reel · Tipos de páginas web 1: la landing',width=1080,height=1920,fps=30,duration=DUR,background=IV,voiceover=vo,layers=layers)
 json.dump(proj,open(ROOT+'projects/tipos-landing.json','w'),ensure_ascii=False,indent=1)
 print(len(layers),'capas · duración',DUR)
 
