@@ -113,8 +113,24 @@ async function loadTemplate(name) {
     if (name === 'blank') { setProject(blankProject()); return; }
     const r = await fetch(`projects/${name}.json`, { cache: 'no-cache' });
     if (!r.ok) throw new Error(r.status);
-    setProject(await r.json());
+    const proj = await r.json();
+    if (proj.media) await loadTemplateMedia(proj.media);
+    setProject(proj);
   } catch (e) { toast('No pude cargar la plantilla'); console.error(e); }
+}
+// Medios que la plantilla trae consigo ({ nombre: url }): se cargan solos si todavía no están en la sesión.
+async function loadTemplateMedia(map) {
+  const todo = Object.entries(map).filter(([nm]) => !assets.has(nm));
+  if (!todo.length) return;
+  toast('Cargando los clips de la plantilla…');
+  for (const [nm, url] of todo) {
+    try {
+      const rr = await fetch(url); if (!rr.ok) continue;
+      const ext = (nm.match(/\.([^.]+)$/) || [])[1]?.toLowerCase(); // el tipo sale de la extensión: no todos los servidores lo declaran
+      const type = { mov: 'video/mp4', mp4: 'video/mp4', m4v: 'video/mp4', webm: 'video/webm', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' }[ext] || (await rr.clone().blob()).type;
+      await registerMedia(new File([await rr.blob()], nm, { type }), nm);
+    } catch (e) { console.warn('clip no cargado', nm, e); }
+  }
 }
 
 // ---------- capas ----------
@@ -358,6 +374,9 @@ const MEDIA_FIELDS = [
   F('zoom', 'Zoom', 'number', { step: 0.1, def: () => 1 }),
   F('fx', 'Enfoque X (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
   F('fy', 'Enfoque Y (0 a 1)', 'number', { step: 0.05, def: () => 0.5 }),
+  F('zoomEnd', 'Zoom final (zoom lento)', 'number', { step: 0.1 }),
+  F('fxEnd', 'Enfoque X final', 'number', { step: 0.05 }),
+  F('fyEnd', 'Enfoque Y final', 'number', { step: 0.05 }),
   F('trim', 'Inicio del clip (s)', 'number', { step: 0.1 }), F('speed', 'Velocidad', 'number', { step: 0.1 }),
 ];
 const SCHEMA = {
@@ -775,10 +794,15 @@ $('#btnScript').onclick = () => {
 
 // plantillas, abrir y guardar
 $('#btnTemplates').onclick = (e) => openMenu(e.currentTarget, [
+  ['Reel: Proceso web con clips', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso-clips')],
   ['Reel: Cómo trabajo (proceso)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('proceso')],
   ['Reel: ¿Tu web está a tu nombre?', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('a-tu-nombre')],
+  ['Reel: SEO · Botox en Antofagasta', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('seo-botox')],
+  ['Portada: caso SEO Antofagasta', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('seo-botox-portada')],
   ['Reel: Un millón por cambiar una foto', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('millon-foto')],
   ['Reel: Los $200.000 por las claves (historia)', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('clienta-200k')],
+  ['Reel: Tipos de páginas web 1 · la landing', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('tipos-landing')],
+  ['Portada: Tipos de páginas web 1', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('tipos-landing-portada')],
   ['Reel en blanco', () => confirm('Esto reemplaza el proyecto actual. ¿Continuar?') && loadTemplate('blank')],
   ['Borrar archivos guardados', async () => { if (confirm('Se borran las grabaciones, sonidos y la voz guardados en este navegador. ¿Continuar?')) { await clearFiles(); toast('Listo. Recarga la página para empezar limpio.'); } }],
 ]);
